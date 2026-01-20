@@ -8,22 +8,29 @@ package chess;
  */
 public class ChessMove {
 
+    private final ChessPosition startPosition; // added 1/20/26, phase 0 video
+    private final ChessPosition endPosition; // added 1/20/26, phase 0 video
+    private final ChessPiece.PieceType promotionPiece; // added 1/20/26, phase 0 video
+
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
+        this.startPosition = startPosition; // added 1/20/26, phase 0 video
+        this.endPosition = endPosition; // added 1/20/26, phase 0 video
+        this.promotionPiece = promotionPiece; // added 1/20/26, phase 0 video
     }
 
     /**
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-        throw new RuntimeException("Not implemented");
+        return startPosition; // added 1/20/26, phase 0 video
     }
 
     /**
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-        throw new RuntimeException("Not implemented");
+        return endPosition; // added 1/20/26, phase 0 video
     }
 
     /**
@@ -33,6 +40,16 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        throw new RuntimeException("Not implemented");
+        return promotionPiece; // added 1/20/26, phase 0 video
+    }
+
+
+    /**
+     * toString for readability in debugging
+     * added 1/20/26, phase 0 video
+     */
+    @Override
+    public String toString() {
+        return String.format("%s%s", startPosition, endPosition);
     }
 }
