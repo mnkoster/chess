@@ -11,7 +11,13 @@ import java.util.List;
  */
 public class ChessPiece {
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+
+    private final ChessGame.TeamColor pieceColor; // added 1/20/26, phase 0 video
+    private final PieceType type; // added 1/20/26, phase 0 video
+
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
+        this.pieceColor = pieceColor; // added 1/20/26, phase 0 video
+        this.type = type; // added 1/20/26, phase 0 video
     }
 
     /**
@@ -30,14 +36,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return pieceColor; // added 1/20/26, phase 0 video
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return type; // added 1/20/26, phase 0 video
     }
 
     /**
@@ -48,6 +54,10 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return List.of(); // added 1/20/26, phase 0 video; UPDATE
+        ChessPiece piece = board.getPiece(myPosition);
+        if (piece.getPieceType() == PieceType.BISHOP) {
+            // fill in
+        }
+        return List.of(); // added 1/20/26, phase 0 video UPDATE
     }
 }

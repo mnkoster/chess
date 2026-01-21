@@ -8,7 +8,7 @@ package chess;
  */
 public class ChessBoard {
 
-    ChessPiece[][] board = new ChessPiece[8][8]; // added 1/20/26, phase 0 video
+    ChessPiece[][] squares = new ChessPiece[8][8]; // added 1/20/26, phase 0 video
     public ChessBoard() {
         
     }
@@ -20,7 +20,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRow()-1][position.getColumn()-1] = piece; // added 1/20/26, phase 0 video
+        squares[position.getRow()-1][position.getColumn()-1] = piece; // added 1/20/26, phase 0 video
     }
 
     /**
@@ -31,7 +31,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow()-1][position.getColumn()-1]; // added 1/20/26, phase 0 video
+        return squares[position.getRow()-1][position.getColumn()-1]; // added 1/20/26, phase 0 video
     }
 
     /**
