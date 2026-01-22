@@ -52,4 +52,37 @@ public class ChessMove {
     public String toString() {
         return String.format("%s%s", startPosition, endPosition);
     }
+
+    /**
+     * equals override
+     * added 1/21/26 to pass EqualsTestingUtility (generated)
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true; // same object
+        if (o == null || getClass() != o.getClass()) return false; // not a ChessMove
+
+        ChessMove that = (ChessMove) o;
+
+        // Compare start and end positions using their equals
+        if (!startPosition.equals(that.startPosition)) return false;
+        if (!endPosition.equals(that.endPosition)) return false;
+
+        // Compare promotionPiece (can be null)
+        if (promotionPiece != that.promotionPiece) return false;
+
+        return true;
+    }
+
+    /**
+     * hashcode override
+     * added 1/21/26 to pass EqualsTestingUtility (generated)
+     */
+    @Override
+    public int hashCode() {
+        int result = startPosition.hashCode();
+        result = 31 * result + endPosition.hashCode();
+        result = 31 * result + (promotionPiece == null ? 0 : promotionPiece.hashCode());
+        return result;
+    }
 }

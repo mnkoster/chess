@@ -86,7 +86,7 @@ public class ChessBoard {
     /**
      * equals override
      * checks that each piece on board is equivalent
-     * added 1/21/26 to pass ChessBoardTests
+     * added 1/21/26 to pass ChessBoardTests (generated)
      */
     @Override
     public boolean equals(Object o) {
@@ -116,7 +116,7 @@ public class ChessBoard {
 
     /**
      * hashcode override
-     * added 1/21/26 to pass ChessBoardTests
+     * added 1/21/26 to pass ChessBoardTests (generated)
      */
     @Override
     public int hashCode() {
