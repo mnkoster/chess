@@ -69,6 +69,7 @@ public class ChessBoard {
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
+     * added 1/21/26 to reset board
      */
     public void resetBoard() {
         for (int i = 0; i < 8; i++) {
@@ -80,5 +81,51 @@ public class ChessBoard {
         pawnRank(ChessGame.TeamColor.WHITE, 2); // WHITE PAWN RANK
         pawnRank(ChessGame.TeamColor.BLACK, 7); // BLACK PAWN RANK
         backRank(ChessGame.TeamColor.BLACK, 8); // BLACK BACK RANK
+    }
+
+    /**
+     * equals override
+     * checks that each piece on board is equivalent
+     * added 1/21/26 to pass ChessBoardTests
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ChessBoard other = (ChessBoard) o;
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece thisPiece = this.squares[row][col];
+                ChessPiece otherPiece = other.squares[row][col];
+
+                if (thisPiece == null && otherPiece == null) {
+                    continue;
+                }
+                if (thisPiece == null || otherPiece == null) {
+                    return false;
+                }
+                if (!thisPiece.equals(otherPiece)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * hashcode override
+     * added 1/21/26 to pass ChessBoardTests
+     */
+    @Override
+    public int hashCode() {
+        int result = 1;
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                result = 31 * result + (squares[row][col] == null ? 0 : squares[row][col].hashCode());
+            }
+        }
+        return result;
     }
 }

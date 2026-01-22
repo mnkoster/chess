@@ -59,4 +59,29 @@ public class ChessPiece {
         }
         return List.of(); // added 1/20/26, phase 0 video UPDATE
     }
+
+    /**
+     * equals override
+     * checks that each piece on board is equivalent
+     * added 1/21/26 to pass ChessBoardTests
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    /**
+     * hashcode override
+     * added 1/21/26 to pass ChessBoardTests
+     */
+    @Override
+    public int hashCode() {
+        int result = pieceColor.hashCode();
+        result = 31 * result + type.hashCode();
+        return result;
+    }
 }
