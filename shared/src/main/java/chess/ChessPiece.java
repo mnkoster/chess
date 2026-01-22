@@ -11,7 +11,6 @@ import java.util.List;
  */
 public class ChessPiece {
 
-
     private final ChessGame.TeamColor pieceColor; // added 1/20/26, phase 0 video
     private final PieceType type; // added 1/20/26, phase 0 video
 
