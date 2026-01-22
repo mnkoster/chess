@@ -54,7 +54,29 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
+
+        // PAWN
+        if (piece.getPieceType() == PieceType.PAWN) {
+            // fill in
+        }
+        // ROOK
+        if (piece.getPieceType() == PieceType.ROOK) {
+            // fill in
+        }
+        // KNIGHT
+        if (piece.getPieceType() == PieceType.KNIGHT) {
+            // fill in
+        }
+        // BISHOP
         if (piece.getPieceType() == PieceType.BISHOP) {
+            // fill in
+        }
+        // QUEEN
+        if (piece.getPieceType() == PieceType.QUEEN) {
+            // fill in
+        }
+        // KING
+        if (piece.getPieceType() == PieceType.KING) {
             // fill in
         }
         return List.of(); // added 1/20/26, phase 0 video UPDATE
