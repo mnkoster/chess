@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -54,10 +55,27 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
-
+        int start_row = myPosition.getRow();
+        int start_col = myPosition.getColumn();
+        Collection<ChessMove> moves = List.of();
         // PAWN
         if (piece.getPieceType() == PieceType.PAWN) {
-            // fill in
+            if (piece.pieceColor == ChessGame.TeamColor.BLACK) {
+                if (start_row == 7) {
+                    moves = pawnMoves(board, 2, -1, myPosition);
+                }
+                else {
+                    moves = pawnMoves(board, 1, -1, myPosition);
+                }
+            }
+            if (piece.pieceColor == ChessGame.TeamColor.WHITE) {
+                if (start_row == 2) {
+                    moves = pawnMoves(board, 2, 1, myPosition);
+                }
+                else {
+                    moves = pawnMoves(board, 1, 1, myPosition);
+                }
+            }
         }
         // ROOK
         if (piece.getPieceType() == PieceType.ROOK) {
@@ -79,7 +97,37 @@ public class ChessPiece {
         if (piece.getPieceType() == PieceType.KING) {
             // fill in
         }
-        return List.of(); // added 1/20/26, phase 0 video UPDATE
+        return moves; // added 1/20/26, phase 0 video UPDATE
+    }
+
+    /**
+     * General check if position is open on the board
+     * added 1/22/26 for piece moves
+     */
+    private boolean openPosition(ChessBoard board, ChessPosition checkPosition) {
+        ChessPiece piece = board.getPiece(checkPosition);
+        return piece == null;
+    }
+
+    /**
+     * Pawn moves: if in start position, one or two spaces; else one space
+     * check for other pieces
+     * added 1/22/26 for piece moves
+     */
+    private Collection<ChessMove> pawnMoves(ChessBoard board, int maxSpaces, int direction, ChessPosition myPosition) {
+        Collection<ChessMove> spaces = new ArrayList<>();
+        // row and column integers for reference
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        // check if space ahead, or two if on started position (passed in through maxSpaces) is clear
+        for (int i = 1; i < maxSpaces+1; i++) {
+            ChessPosition check = new ChessPosition(row + (i*direction), col);
+            if (!openPosition(board, check)) {
+                break;
+            }
+            spaces.add(new ChessMove(myPosition, new ChessPosition(row + (i*direction), col), null));
+        }
+        return spaces;
     }
 
     /**
