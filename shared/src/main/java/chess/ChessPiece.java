@@ -233,9 +233,7 @@ public class ChessPiece {
         // offset 0: forward; offset 1: diagonal up right
         for (int i = 1; i < 8; i++) {
             int check_row = start_row + i; int check_col = start_col + (offset * i);
-            if (!inBound(check_row, check_col)) {
-                break;
-            }
+            if (!inBound(check_row, check_col)) { break; }
             ChessPosition otherPosition = new ChessPosition(check_row, check_col);
             if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
             else {
