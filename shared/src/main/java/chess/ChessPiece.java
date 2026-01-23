@@ -77,7 +77,7 @@ public class ChessPiece {
         }
         // KNIGHT
         if (piece.getPieceType() == PieceType.KNIGHT) {
-            // fill in
+            moves = knightMoves(board, piece, myPosition);
         }
         // BISHOP
         if (piece.getPieceType() == PieceType.BISHOP) {
@@ -102,9 +102,7 @@ public class ChessPiece {
      * Check if space is out of bounds before making move
      * added 1/23/26 for piece moves
      */
-    private boolean inBound(int row, int col) {
-        return (1 <= row && row <= 8 && 1 <= col && col <= 8);
-    }
+    private boolean inBound(int row, int col) { return (1 <= row && row <= 8 && 1 <= col && col <= 8); }
 
     /**
      * General check if position is open on the board
@@ -119,10 +117,7 @@ public class ChessPiece {
      * Check if unavailable space is enemy/capturable
      * added 1/22/26 for piece moves
      */
-    private boolean capturable(ChessPiece piece, ChessPiece other) {
-        return piece.pieceColor != other.pieceColor;
-    }
-
+    private boolean capturable(ChessPiece piece, ChessPiece other) { return piece.pieceColor != other.pieceColor; }
 
     /**
      * Checks for pawn movement
@@ -138,17 +133,13 @@ public class ChessPiece {
         for (int i = 1; i < maxSpaces+1; i++) {
             int row_check = row + (i*direction);
             ChessPosition otherPosition = new ChessPosition(row_check, col);
-            if (!openPosition(board, otherPosition)) { // check if space is open
-                break;
-            }
+            if (!openPosition(board, otherPosition)) { break; }// check if space is open
             if (row_check == 8 || row_check == 1) { // edge/promotion
                 spaces.add(new ChessMove(myPosition, otherPosition, PieceType.QUEEN));
                 spaces.add(new ChessMove(myPosition, otherPosition, PieceType.ROOK));
                 spaces.add(new ChessMove(myPosition, otherPosition, PieceType.BISHOP));
                 spaces.add(new ChessMove(myPosition, otherPosition, PieceType.KNIGHT));
-            } else { // just space ahead
-                spaces.add(new ChessMove(myPosition, new ChessPosition(row + (i * direction), col), null));
-            }
+            } else { spaces.add(new ChessMove(myPosition, otherPosition, null)); } // space ahead
         }
         return spaces;
     }
@@ -173,9 +164,7 @@ public class ChessPiece {
                         captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.ROOK));
                         captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.BISHOP));
                         captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.KNIGHT));
-                    } else { // just space ahead
-                        captureSpace.add(new ChessMove(myPosition, otherPosition, null));
-                    }
+                    } else { captureSpace.add(new ChessMove(myPosition, otherPosition, null)); } // space ahead
                 }
             }
         }
@@ -190,9 +179,7 @@ public class ChessPiece {
                         captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.ROOK));
                         captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.BISHOP));
                         captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.KNIGHT));
-                    } else { // just space ahead
-                        captureSpace.add(new ChessMove(myPosition, otherPosition, null));
-                    }
+                    } else { captureSpace.add(new ChessMove(myPosition, otherPosition, null)); } // space ahead
                 }
             }
         }
@@ -208,14 +195,32 @@ public class ChessPiece {
             for (int j = -1; j < 2; j++) {
                 if (inBound(row + i, col + j)) {
                     ChessPosition otherPosition = new ChessPosition(row + i, col + j);
-                    if (openPosition(board, otherPosition)) {
-                        spaces.add(new ChessMove(myPosition, otherPosition, null));
-                    } else {
+                    if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
+                    else {
                         ChessPiece other = board.getPiece(otherPosition);
-                        if (capturable(piece, other)) {
-                            spaces.add(new ChessMove(myPosition, otherPosition, null));
-                        }
+                        if (capturable(piece, other)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
                     }
+                }
+            }
+        }
+        return spaces;
+    }
+
+    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPiece piece, ChessPosition myPosition) {
+        Collection<ChessMove> spaces = new ArrayList<>();
+        int start_row = myPosition.getRow();
+        int start_col = myPosition.getColumn();
+        int[][] possible = {{start_row + 2, start_col - 1}, {start_row + 2, start_col + 1},
+                {start_row - 2, start_col - 1}, {start_row - 2, start_col + 1},
+                {start_row + 1, start_col - 2}, {start_row + 1, start_col + 2},
+                {start_row - 1, start_col - 2}, {start_row - 1, start_col + 2}};
+        for (int i=0; i < 8; i++) {
+            if (inBound(possible[i][0], possible[i][1])) {
+                ChessPosition otherPosition = new ChessPosition(possible[i][0], possible[i][1]);
+                if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
+                else {
+                    ChessPiece other = board.getPiece(otherPosition);
+                    if (capturable(piece, other)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
                 }
             }
         }
