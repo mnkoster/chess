@@ -57,18 +57,19 @@ public class ChessPiece {
         ChessPiece piece = board.getPiece(myPosition);
         int start_row = myPosition.getRow();
         int start_col = myPosition.getColumn();
-        Collection<ChessMove> moves = List.of();
+        Collection<ChessMove> moves = new ArrayList<>();
         // PAWN
         if (piece.getPieceType() == PieceType.PAWN) {
             if (piece.pieceColor == ChessGame.TeamColor.BLACK) {
-                if (start_row == 7) { moves = forwardMoves(board, piece, 2, -1, myPosition); }
-                else { moves = forwardMoves(board, piece,1, -1, myPosition); }
+                if (start_row == 7) { moves = pawnMoves(board, 2, -1, myPosition); }
+                else { moves = pawnMoves(board, 1, -1, myPosition); }
+                moves.addAll(pawnCapture(board, piece, -1, myPosition));
             }
             if (piece.pieceColor == ChessGame.TeamColor.WHITE) {
-                if (start_row == 2) { moves = forwardMoves(board, piece,2, 1, myPosition); }
-                else { moves = forwardMoves(board, piece,1, 1, myPosition); }
+                if (start_row == 2) { moves = pawnMoves(board, 2, 1, myPosition); }
+                else { moves = pawnMoves(board, 1, 1, myPosition); }
+                moves.addAll(pawnCapture(board, piece, 1, myPosition));
             }
-
         }
         // ROOK
         if (piece.getPieceType() == PieceType.ROOK) {
@@ -93,6 +94,16 @@ public class ChessPiece {
         return moves; // added 1/20/26, phase 0 video UPDATE
     }
 
+    // ********************** PIECE MOVE LOGIC *******************************************
+
+    /**
+     * Check if space is out of bounds before making move
+     * added 1/23/26 for piece moves
+     */
+    private boolean inBound(int row, int col) {
+        return (1 <= row & row <= 8 & 1 <= col & col <= 8);
+    }
+
     /**
      * General check if position is open on the board
      * added 1/22/26 for piece moves
@@ -106,31 +117,60 @@ public class ChessPiece {
      * Check if unavailable space is enemy/capturable
      * added 1/22/26 for piece moves
      */
-    private boolean capture(ChessPiece piece, ChessPiece other) {
+    private boolean capturable(ChessPiece piece, ChessPiece other) {
         return piece.pieceColor != other.pieceColor;
     }
 
 
     /**
-     * Checks for movement forward
-     * check for other pieces
+     * Checks for pawn movement
      * added 1/22/26 for piece moves
+     * updated 1/23/26 for pawn specific
      */
-    private Collection<ChessMove> forwardMoves(ChessBoard board, ChessPiece piece, int maxSpaces, int direction, ChessPosition myPosition) {
+    private Collection<ChessMove> pawnMoves(ChessBoard board, int maxSpaces, int direction, ChessPosition myPosition) {
         Collection<ChessMove> spaces = new ArrayList<>();
         // row and column integers for reference
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         // check if space ahead up to maxSpaces (1/2 for rook, 1 for king, to edge for rest) is clear
         for (int i = 1; i < maxSpaces+1; i++) {
-            ChessPosition check = new ChessPosition(row + (i*direction), col);
-            // once no longer clear, check for capture (except rook), and break
-            if (row == 1 || row == 8 || (!openPosition(board, check))) {
+            int row_check = row + (i*direction);
+            if (!inBound(row_check, col)) { // check space is valid on board
+                break;
+            }
+            ChessPosition check = new ChessPosition(row_check, col);
+            if (!openPosition(board, check)) { // check if space is open
                 break;
             }
             spaces.add(new ChessMove(myPosition, new ChessPosition(row + (i*direction), col), null));
         }
         return spaces;
+    }
+
+    /**
+     * Capture for pawn movement
+     * added 1/23/26 for pawn specific
+     */
+    private Collection<ChessMove> pawnCapture(ChessBoard board, ChessPiece piece, int direction, ChessPosition myPosition) {
+        int row_check = myPosition.getRow() + direction;
+        int left_col = myPosition.getColumn() - 1;
+        int right_col = myPosition.getColumn() + 1;
+        Collection<ChessMove> captureSpace = new ArrayList<>();
+        if (inBound(row_check, left_col)) {
+            ChessPosition checkPosition = new ChessPosition(row_check, left_col);
+            if (!openPosition(board, checkPosition)) { // check if space is open
+                ChessPiece other = board.getPiece(checkPosition);
+                if (capturable(piece, other)) { captureSpace.add(new ChessMove(myPosition, checkPosition, null)); }
+            }
+        }
+        if (inBound(row_check, right_col)) {
+            ChessPosition checkPosition = new ChessPosition(row_check, right_col);
+            if (!openPosition(board, checkPosition)) { // check if space is open
+                ChessPiece other = board.getPiece(checkPosition);
+                if (capturable(piece, other)) { captureSpace.add(new ChessMove(myPosition, checkPosition, null)); }
+            }
+        }
+        return captureSpace;
     }
 
     /**
