@@ -73,7 +73,7 @@ public class ChessPiece {
         }
         // ROOK
         if (piece.getPieceType() == PieceType.ROOK) {
-            // fill in
+            moves = rookMoves(board, piece, myPosition);
         }
         // KNIGHT
         if (piece.getPieceType() == PieceType.KNIGHT) {
@@ -222,6 +222,65 @@ public class ChessPiece {
                     ChessPiece other = board.getPiece(otherPosition);
                     if (capturable(piece, other)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
                 }
+            }
+        }
+        return spaces;
+    }
+
+    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPiece piece, ChessPosition myPosition) {
+        Collection<ChessMove> spaces = new ArrayList<>();
+        int start_row = myPosition.getRow();
+        int start_col = myPosition.getColumn();
+        // Forward
+        for (int i=1; i < 8; i++) {
+            if (!inBound(start_row + i, start_col)) {
+                break;
+            }
+            ChessPosition otherPosition = new ChessPosition(start_row + i, start_col);
+            if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
+            else {
+                ChessPiece other = board.getPiece(otherPosition);
+                if (capturable(piece, other)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
+                break;
+            }
+        }
+        // Backward
+        for (int i=1; i < 8; i++) {
+            if (!inBound(start_row - i, start_col)) {
+                break;
+            }
+            ChessPosition otherPosition = new ChessPosition(start_row - i, start_col);
+            if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
+            else {
+                ChessPiece other = board.getPiece(otherPosition);
+                if (capturable(piece, other)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
+                break;
+            }
+        }
+        // Right
+        for (int i=1; i < 8; i++) {
+            if (!inBound(start_row, start_col + i)) {
+                break;
+            }
+            ChessPosition otherPosition = new ChessPosition(start_row, start_col + i);
+            if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
+            else {
+                ChessPiece other = board.getPiece(otherPosition);
+                if (capturable(piece, other)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
+                break;
+            }
+        }
+        // Right
+        for (int i=1; i < 8; i++) {
+            if (!inBound(start_row, start_col - i)) {
+                break;
+            }
+            ChessPosition otherPosition = new ChessPosition(start_row, start_col - i);
+            if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
+            else {
+                ChessPiece other = board.getPiece(otherPosition);
+                if (capturable(piece, other)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
+                break;
             }
         }
         return spaces;
