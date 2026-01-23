@@ -73,7 +73,7 @@ public class ChessPiece {
         }
         // ROOK
         if (piece.getPieceType() == PieceType.ROOK) {
-            moves = rookMoves(board, piece, myPosition);
+            moves = straightMoves(board, piece, myPosition, 0);
         }
         // KNIGHT
         if (piece.getPieceType() == PieceType.KNIGHT) {
@@ -81,7 +81,7 @@ public class ChessPiece {
         }
         // BISHOP
         if (piece.getPieceType() == PieceType.BISHOP) {
-            // fill in
+            moves = straightMoves(board, piece, myPosition, 1);
         }
         // QUEEN
         if (piece.getPieceType() == PieceType.QUEEN) {
@@ -227,16 +227,17 @@ public class ChessPiece {
         return spaces;
     }
 
-    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPiece piece, ChessPosition myPosition) {
+    private Collection<ChessMove> straightMoves(ChessBoard board, ChessPiece piece, ChessPosition myPosition, int offset) {
         Collection<ChessMove> spaces = new ArrayList<>();
         int start_row = myPosition.getRow();
         int start_col = myPosition.getColumn();
-        // Forward
-        for (int i=1; i < 8; i++) {
-            if (!inBound(start_row + i, start_col)) {
+        // offset 0: forward; offset 1: diagonal up right
+        for (int i = 1; i < 8; i++) {
+            int check_row = start_row + i; int check_col = start_col + (offset * i);
+            if (!inBound(check_row, check_col)) {
                 break;
             }
-            ChessPosition otherPosition = new ChessPosition(start_row + i, start_col);
+            ChessPosition otherPosition = new ChessPosition(check_row, check_col);
             if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
             else {
                 ChessPiece other = board.getPiece(otherPosition);
@@ -244,12 +245,13 @@ public class ChessPiece {
                 break;
             }
         }
-        // Backward
-        for (int i=1; i < 8; i++) {
-            if (!inBound(start_row - i, start_col)) {
+        // offset 0: backward; offset 1: diagonal back left
+        for (int i = 1; i < 8; i++) {
+            int check_row = start_row - i; int check_col = start_col - (offset * i);
+            if (!inBound(check_row, check_col)) {
                 break;
             }
-            ChessPosition otherPosition = new ChessPosition(start_row - i, start_col);
+            ChessPosition otherPosition = new ChessPosition(check_row, check_col);
             if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
             else {
                 ChessPiece other = board.getPiece(otherPosition);
@@ -257,12 +259,13 @@ public class ChessPiece {
                 break;
             }
         }
-        // Right
-        for (int i=1; i < 8; i++) {
-            if (!inBound(start_row, start_col + i)) {
+        // offset 0: right; offset 1: diagonal back right
+        for (int i = 1; i < 8; i++) {
+            int check_row = start_row - (offset * i); int check_col = start_col + i;
+            if (!inBound(check_row, check_col)) {
                 break;
             }
-            ChessPosition otherPosition = new ChessPosition(start_row, start_col + i);
+            ChessPosition otherPosition = new ChessPosition(check_row, check_col);
             if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
             else {
                 ChessPiece other = board.getPiece(otherPosition);
@@ -270,12 +273,13 @@ public class ChessPiece {
                 break;
             }
         }
-        // Right
-        for (int i=1; i < 8; i++) {
-            if (!inBound(start_row, start_col - i)) {
+        // offset 0: left; offset 1: diagonal up left
+        for (int i = 1; i < 8; i++) {
+            int check_row = start_row + (offset * i); int check_col = start_col - i;
+            if (!inBound(check_row, check_col)) {
                 break;
             }
-            ChessPosition otherPosition = new ChessPosition(start_row, start_col - i);
+            ChessPosition otherPosition = new ChessPosition(check_row, check_col);
             if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
             else {
                 ChessPiece other = board.getPiece(otherPosition);
