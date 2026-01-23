@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Represents a single chess piece
@@ -56,7 +55,6 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
         int start_row = myPosition.getRow();
-        int start_col = myPosition.getColumn();
         Collection<ChessMove> moves = new ArrayList<>();
         // PAWN
         if (piece.getPieceType() == PieceType.PAWN) {
@@ -73,7 +71,7 @@ public class ChessPiece {
         }
         // ROOK
         if (piece.getPieceType() == PieceType.ROOK) {
-            moves = straightMoves(board, piece, myPosition, 0);
+            moves = straightMoves(board, piece, myPosition, 0); // straights
         }
         // KNIGHT
         if (piece.getPieceType() == PieceType.KNIGHT) {
@@ -81,11 +79,12 @@ public class ChessPiece {
         }
         // BISHOP
         if (piece.getPieceType() == PieceType.BISHOP) {
-            moves = straightMoves(board, piece, myPosition, 1);
+            moves = straightMoves(board, piece, myPosition, 1); // diagonals
         }
         // QUEEN
         if (piece.getPieceType() == PieceType.QUEEN) {
-            // fill in
+            moves = straightMoves(board, piece, myPosition, 0); // straights
+            moves.addAll(straightMoves(board, piece, myPosition, 1)); // diagonals
         }
         // KING
         if (piece.getPieceType() == PieceType.KING) {
