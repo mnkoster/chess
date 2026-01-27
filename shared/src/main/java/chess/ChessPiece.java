@@ -240,20 +240,23 @@ public class ChessPiece {
         int currRow = myPosition.getRow();
         int currCol = myPosition.getColumn();
 
-        for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
-                int checkRow = currRow + i;
-                int checkCol = currCol + j;
+        int[][] possible = {{currRow - 1, currCol - 1}, {currRow - 1, currCol},
+                {currRow - 1, currCol + 1}, {currRow, currCol + 1},
+                {currRow, currCol - 1}, {currRow + 1, currCol},
+                {currRow + 1, currCol + 1}, {currRow + 1, currCol - 1}};
 
-                if (inBound(checkRow, checkCol)) {
-                    ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
-                    if (openPosition(board, checkPos)) {
+        for (int i = 0; i < 8; i++) {
+            int checkRow = possible[i][0];
+            int checkCol = possible[i][1];
+
+            if (inBound(checkRow, checkCol)) {
+                ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
+                if (openPosition(board, checkPos)) {
+                    moves.add(new ChessMove(myPosition, checkPos, null));
+                } else {
+                    ChessPiece other = board.getPiece(checkPos);
+                    if (capturable(piece, other)) {
                         moves.add(new ChessMove(myPosition, checkPos, null));
-                    } else {
-                        ChessPiece other = board.getPiece(checkPos);
-                        if (capturable(piece, other)) {
-                            moves.add(new ChessMove(myPosition, checkPos, null));
-                        }
                     }
                 }
             }
