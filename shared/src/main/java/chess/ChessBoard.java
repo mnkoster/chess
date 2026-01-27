@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -9,6 +12,7 @@ package chess;
 public class ChessBoard {
 
     ChessPiece[][] squares = new ChessPiece[8][8]; // added 1/20/26, phase 0 video
+
     public ChessBoard() {
 
     }
@@ -84,47 +88,23 @@ public class ChessBoard {
     }
 
     /**
-     * equals override
-     * checks that each piece on board is equivalent
-     * added 1/21/26 to pass ChessBoardTests (generated)
+     * equality and hashcode
+     * updated 1/27/26 from p0 implementation
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ChessBoard other = (ChessBoard) o;
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                ChessPiece thisPiece = this.squares[row][col];
-                ChessPiece otherPiece = other.squares[row][col];
-
-                if (thisPiece == null && otherPiece == null) {
-                    continue;
-                }
-                if (thisPiece == null || otherPiece == null) {
-                    return false;
-                }
-                if (!thisPiece.equals(otherPiece)) {
-                    return false;
-                }
-            }
+        if (!(o instanceof ChessBoard that)) {
+            return false;
         }
-        return true;
+        return Objects.deepEquals(squares, that.squares);
     }
 
     /**
-     * hashcode override
-     * added 1/21/26 to pass ChessBoardTests (generated)
+     * equality and hashcode
+     * updated 1/27/26 from p0 implementation
      */
     @Override
     public int hashCode() {
-        int result = 1;
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                result = 31 * result + (squares[row][col] == null ? 0 : squares[row][col].hashCode());
-            }
-        }
-        return result;
+        return Arrays.deepHashCode(squares);
     }
 }
