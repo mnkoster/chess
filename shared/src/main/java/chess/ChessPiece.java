@@ -143,6 +143,20 @@ public class ChessPiece {
         return spaces;
     }
 
+    private Collection<ChessMove> pawnPromotion(ChessBoard board, int rowCheck, ChessPosition myPosition,
+                                                ChessPosition otherPosition, ChessPiece piece, ChessPiece other) {
+        Collection<ChessMove> captureSpace = new ArrayList<>();
+        if (!openPosition(board, otherPosition) && (capturable(piece, other))) { // check if space is open{
+            if (rowCheck == 8 || rowCheck == 1) { // add all promotions
+                captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.QUEEN));
+                captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.ROOK));
+                captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.BISHOP));
+                captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.KNIGHT));
+            } else { captureSpace.add(new ChessMove(myPosition, otherPosition, null)); } // space ahead
+        }
+        return captureSpace;
+    }
+
     /**
      * Capture for pawn movement
      * added 1/23/26 for pawn specific
@@ -156,27 +170,13 @@ public class ChessPiece {
         if (inBound(rowCheck, leftCol)) {
             ChessPosition otherPosition = new ChessPosition(rowCheck, leftCol);
             ChessPiece other = board.getPiece(otherPosition);
-            if (!openPosition(board, otherPosition) & (capturable(piece, other))) { // check if space is open{
-                if (rowCheck == 8 || rowCheck == 1) { // add all promotions
-                    captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.QUEEN));
-                    captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.ROOK));
-                    captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.BISHOP));
-                    captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.KNIGHT));
-                } else { captureSpace.add(new ChessMove(myPosition, otherPosition, null)); } // space ahead
-            }
+            captureSpace.addAll(pawnPromotion(board, rowCheck, myPosition, otherPosition, piece, other));
         }
         // check one space forward and right
         if (inBound(rowCheck, rightCol)) {
             ChessPosition otherPosition = new ChessPosition(rowCheck, rightCol);
             ChessPiece other = board.getPiece(otherPosition);
-            if (!openPosition(board, otherPosition) & (capturable(piece, other))) { // check if space is open{
-                if (rowCheck == 8 || rowCheck == 1) { // add all promotions
-                    captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.QUEEN));
-                    captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.ROOK));
-                    captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.BISHOP));
-                    captureSpace.add(new ChessMove(myPosition, otherPosition, PieceType.KNIGHT));
-                } else { captureSpace.add(new ChessMove(myPosition, otherPosition, null)); } // space ahead
-            }
+            captureSpace.addAll(pawnPromotion(board, rowCheck, myPosition, otherPosition, piece, other));
         }
         return captureSpace;
     }
