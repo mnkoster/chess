@@ -204,11 +204,11 @@ public class ChessPiece {
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPiece piece, ChessPosition myPosition) {
         Collection<ChessMove> spaces = new ArrayList<>();
         int startRow = myPosition.getRow();
-        int start_col = myPosition.getColumn();
-        int[][] possible = {{startRow + 2, start_col - 1}, {startRow + 2, start_col + 1},
-                {startRow - 2, start_col - 1}, {startRow - 2, start_col + 1},
-                {startRow + 1, start_col - 2}, {startRow + 1, start_col + 2},
-                {startRow - 1, start_col - 2}, {startRow - 1, start_col + 2}};
+        int startCol = myPosition.getColumn();
+        int[][] possible = {{startRow + 2, startCol - 1}, {startRow + 2, startCol + 1},
+                {startRow - 2, startCol - 1}, {startRow - 2, startCol + 1},
+                {startRow + 1, startCol - 2}, {startRow + 1, startCol + 2},
+                {startRow - 1, startCol - 2}, {startRow - 1, startCol + 2}};
         for (int i=0; i < 8; i++) {
             if (inBound(possible[i][0], possible[i][1])) {
                 ChessPosition otherPosition = new ChessPosition(possible[i][0], possible[i][1]);
@@ -225,10 +225,10 @@ public class ChessPiece {
     private Collection<ChessMove> straightMoves(ChessBoard board, ChessPiece piece, ChessPosition myPosition, int offset) {
         Collection<ChessMove> spaces = new ArrayList<>();
         int startRow = myPosition.getRow();
-        int start_col = myPosition.getColumn();
+        int startCol = myPosition.getColumn();
         // offset 0: forward; offset 1: diagonal up right
         for (int i = 1; i < 8; i++) {
-            int checkRow = startRow + i; int checkCol = start_col + (offset * i);
+            int checkRow = startRow + i; int checkCol = startCol + (offset * i);
             if (!inBound(checkRow, checkCol)) { break; }
             ChessPosition otherPosition = new ChessPosition(checkRow, checkCol);
             if (openPosition(board, otherPosition)) { spaces.add(new ChessMove(myPosition, otherPosition, null)); }
@@ -240,7 +240,7 @@ public class ChessPiece {
         }
         // offset 0: backward; offset 1: diagonal back left
         for (int i = 1; i < 8; i++) {
-            int checkRow = startRow - i; int checkCol = start_col - (offset * i);
+            int checkRow = startRow - i; int checkCol = startCol - (offset * i);
             if (!inBound(checkRow, checkCol)) {
                 break;
             }
@@ -254,7 +254,7 @@ public class ChessPiece {
         }
         // offset 0: right; offset 1: diagonal back right
         for (int i = 1; i < 8; i++) {
-            int checkRow = startRow - (offset * i); int checkCol = start_col + i;
+            int checkRow = startRow - (offset * i); int checkCol = startCol + i;
             if (!inBound(checkRow, checkCol)) {
                 break;
             }
@@ -268,7 +268,7 @@ public class ChessPiece {
         }
         // offset 0: left; offset 1: diagonal up left
         for (int i = 1; i < 8; i++) {
-            int checkRow = startRow + (offset * i); int checkCol = start_col - i;
+            int checkRow = startRow + (offset * i); int checkCol = startCol - i;
             if (!inBound(checkRow, checkCol)) {
                 break;
             }
