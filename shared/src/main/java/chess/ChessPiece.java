@@ -119,7 +119,7 @@ public class ChessPiece {
                 } else {
                     moves = pawnMove(board, 1, 1, myPosition);
                 }
-                moves.addAll(pawnCapture(board, piece,1, myPosition));
+                moves.addAll(pawnCapture(board, piece, 1, myPosition));
             }
         }
         return moves;
@@ -158,8 +158,8 @@ public class ChessPiece {
         int currRow = myPosition.getRow();
         int currCol = myPosition.getColumn();
 
-        for (int i = 1; i < maxSpaces+1; i++) {
-            int checkRow = currRow + (i*direction);
+        for (int i = 1; i < maxSpaces + 1; i++) {
+            int checkRow = currRow + (i * direction);
 
             if (inBound(checkRow, currCol)) {
                 ChessPosition checkPos = new ChessPosition(checkRow, currCol);
@@ -297,90 +297,59 @@ public class ChessPiece {
         return moves;
     }
 
+    private Collection<ChessMove> straightForward(ChessBoard board, ChessPiece piece, ChessPosition myPosition,
+                                                  int offset, int rowDirection, int colDirection) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        int currRow = myPosition.getRow();
+        int currCol = myPosition.getColumn();
+
+        for (int i = 1; i < 9; i++) {
+            int checkRow = currRow + (i * rowDirection);
+            int checkCol = currCol + (i * offset * colDirection);
+
+            if (inBound(checkRow, checkCol)) {
+                ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
+                if (openPosition(board, checkPos)) {
+                    moves.add(new ChessMove(myPosition, checkPos, null));
+                } else {
+                    ChessPiece other = board.getPiece(checkPos);
+                    if (capturable(piece, other)) {
+                        moves.add(new ChessMove(myPosition, checkPos, null));
+                    }
+                    break;
+                }
+            }
+        }
+
+        for (int i = 1; i < 9; i++) {
+            int checkRow = currRow + (i * offset * rowDirection);
+            int checkCol = currCol - (i * colDirection);
+
+            if (inBound(checkRow, checkCol)) {
+                ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
+                if (openPosition(board, checkPos)) {
+                    moves.add(new ChessMove(myPosition, checkPos, null));
+                } else {
+                    ChessPiece other = board.getPiece(checkPos);
+                    if (capturable(piece, other)) {
+                        moves.add(new ChessMove(myPosition, checkPos, null));
+                    }
+                    break;
+                }
+            }
+        }
+        return moves;
+    }
+
     /**
      * Checks for straight/diagonal spaces
      * added 1/27/26 from p0 implementation - updated for quality
      */
     private Collection<ChessMove> straightMoves(ChessBoard board, ChessPiece piece, ChessPosition myPosition, int offset) {
         Collection<ChessMove> moves = new ArrayList<>();
-        int currRow = myPosition.getRow();
-        int currCol = myPosition.getColumn();
 
-        // FORWARD, UP RIGHT
-        for (int i = 1; i < 9; i++) {
-            int checkRow = currRow + i;
-            int checkCol = currCol + (i*offset);
-
-            if (inBound(checkRow, checkCol)) {
-                ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
-                if (openPosition(board, checkPos)) {
-                    moves.add(new ChessMove(myPosition, checkPos, null));
-                } else {
-                    ChessPiece other = board.getPiece(checkPos);
-                    if (capturable(piece, other)) {
-                        moves.add(new ChessMove(myPosition, checkPos, null));
-                    }
-                    break;
-                }
-            }
-        }
-
-        // BACKWARD, BACK LEFT
-        for (int i = 1; i < 9; i++) {
-            int checkRow = currRow - i;
-            int checkCol = currCol - (i*offset);
-
-            if (inBound(checkRow, checkCol)) {
-                ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
-                if (openPosition(board, checkPos)) {
-                    moves.add(new ChessMove(myPosition, checkPos, null));
-                } else {
-                    ChessPiece other = board.getPiece(checkPos);
-                    if (capturable(piece, other)) {
-                        moves.add(new ChessMove(myPosition, checkPos, null));
-                    }
-                    break;
-                }
-            }
-        }
-
-        // LEFT, UP RIGHT
-        for (int i = 1; i < 9; i++) {
-            int checkRow = currRow + (i*offset);
-            int checkCol = currCol - i;
-
-            if (inBound(checkRow, checkCol)) {
-                ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
-                if (openPosition(board, checkPos)) {
-                    moves.add(new ChessMove(myPosition, checkPos, null));
-                } else {
-                    ChessPiece other = board.getPiece(checkPos);
-                    if (capturable(piece, other)) {
-                        moves.add(new ChessMove(myPosition, checkPos, null));
-                    }
-                    break;
-                }
-            }
-        }
-
-        // RIGHT, BACK RIGHT
-        for (int i = 1; i < 9; i++) {
-            int checkRow = currRow - (i*offset);
-            int checkCol = currCol + i;
-
-            if (inBound(checkRow, checkCol)) {
-                ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
-                if (openPosition(board, checkPos)) {
-                    moves.add(new ChessMove(myPosition, checkPos, null));
-                } else {
-                    ChessPiece other = board.getPiece(checkPos);
-                    if (capturable(piece, other)) {
-                        moves.add(new ChessMove(myPosition, checkPos, null));
-                    }
-                    break;
-                }
-            }
-        }
+        moves.addAll(straightForward(board, piece, myPosition, offset, 1, 1));
+        moves.addAll(straightForward(board, piece, myPosition, offset, -1, -1));
         return moves;
     }
 }
