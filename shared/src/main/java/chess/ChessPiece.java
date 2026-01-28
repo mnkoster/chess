@@ -150,6 +150,23 @@ public class ChessPiece {
     }
 
     /**
+     * Pawn spaces, promotion or null
+     * Added 1/28/26 from p0 implementation - updated for quality
+     */
+    private Collection<ChessMove> pawnPromo(int checkRow, ChessPosition myPosition, ChessPosition checkPos) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        if (checkRow == 1 || checkRow == 8) { // promotion
+            moves.add(new ChessMove(myPosition, checkPos, PieceType.QUEEN));
+            moves.add(new ChessMove(myPosition, checkPos, PieceType.KNIGHT));
+            moves.add(new ChessMove(myPosition, checkPos, PieceType.BISHOP));
+            moves.add(new ChessMove(myPosition, checkPos, PieceType.ROOK));
+        } else {
+            moves.add(new ChessMove(myPosition, checkPos, null));
+        }
+        return moves;
+    }
+
+    /**
      * Checks for pawn spaces
      * added 1/27/26 from p0 implementation - updated for quality
      */
@@ -164,16 +181,27 @@ public class ChessPiece {
             if (inBound(checkRow, currCol)) {
                 ChessPosition checkPos = new ChessPosition(checkRow, currCol);
                 if (openPosition(board, checkPos)) {
-                    if (checkRow == 1 || checkRow == 8) { // promotion
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.QUEEN));
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.KNIGHT));
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.BISHOP));
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.ROOK));
-                    } else {
-                        moves.add(new ChessMove(myPosition, checkPos, null));
-                    }
+                    moves.addAll(pawnPromo(checkRow, myPosition, checkPos));
                 } else {
                     break;
+                }
+            }
+        }
+        return moves;
+    }
+
+    /**
+     * Pawn help to add promotions
+     */
+    private Collection<ChessMove> pawnCaptureHelp(ChessBoard board, ChessPiece piece, ChessPosition myPosition,
+                                                int checkRow, int checkCol) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        if (inBound(checkRow, checkCol)) {
+            ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
+            if (!openPosition(board, checkPos)) {
+                ChessPiece other = board.getPiece(checkPos);
+                if (capturable(piece, other)) {
+                    moves.addAll(pawnPromo(checkRow, myPosition, checkPos));
                 }
             }
         }
@@ -193,41 +221,8 @@ public class ChessPiece {
         int leftCol = currCol - 1;
         int rightCol = currCol + 1;
 
-        // LEFT
-        if (inBound(checkRow, leftCol)) {
-            ChessPosition checkPos = new ChessPosition(checkRow, leftCol);
-            if (!openPosition(board, checkPos)) {
-                ChessPiece other = board.getPiece(checkPos);
-                if (capturable(piece, other)) {
-                    if (checkRow == 1 || checkRow == 8) { // promotion
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.QUEEN));
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.KNIGHT));
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.BISHOP));
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.ROOK));
-                    } else {
-                        moves.add(new ChessMove(myPosition, checkPos, null));
-                    }
-                }
-            }
-        }
-
-        // RIGHT
-        if (inBound(checkRow, rightCol)) {
-            ChessPosition checkPos = new ChessPosition(checkRow, rightCol);
-            if (!openPosition(board, checkPos)) {
-                ChessPiece other = board.getPiece(checkPos);
-                if (capturable(piece, other)) {
-                    if (checkRow == 1 || checkRow == 8) { // promotion
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.QUEEN));
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.KNIGHT));
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.BISHOP));
-                        moves.add(new ChessMove(myPosition, checkPos, PieceType.ROOK));
-                    } else {
-                        moves.add(new ChessMove(myPosition, checkPos, null));
-                    }
-                }
-            }
-        }
+        moves.addAll(pawnCaptureHelp(board, piece, myPosition, checkRow, leftCol));
+        moves.addAll(pawnCaptureHelp(board, piece, myPosition, checkRow, rightCol));
         return moves;
     }
 
