@@ -9,6 +9,7 @@ import java.util.Objects;
  * <p>
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
+ * updated 1/28/26 for conciseness/quality: all piece moves working and passing quality
  */
 public class ChessPiece {
 
@@ -137,6 +138,12 @@ public class ChessPiece {
         }
         return moves;
     }
+
+    /*
+     ********************************************************************************************
+     ************************************* MOVE HELPER FUNCTIONS ********************************
+     ********************************************************************************************
+     */
 
     /**
      * helper function for spaces
