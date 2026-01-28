@@ -82,16 +82,26 @@ public class ChessPiece {
         ChessPiece piece = board.getPiece(myPosition);
         // KING
         if (piece.type == PieceType.KING) {
-            moves = kingMoves(board, piece, myPosition);
+            for (int i = -1; i < 2; i++) {
+                for (int j = -1; j < 2; j++) {
+                    moves.addAll(straightMoves(board, piece, myPosition, i, j, false));
+                }
+            }
         }
         // QUEEN
         if (piece.type == PieceType.QUEEN) {
-            moves = straightMoves(board, piece, myPosition, 0);
-            moves.addAll(straightMoves(board, piece, myPosition, 1));
+            for (int i = -1; i < 2; i++) {
+                for (int j = -1; j < 2; j++) {
+                    moves.addAll(straightMoves(board, piece, myPosition, i, j, true));
+                }
+            }
         }
         // BISHOP
         if (piece.type == PieceType.BISHOP) {
-            moves = straightMoves(board, piece, myPosition, 1);
+            moves.addAll(straightMoves(board, piece, myPosition, 1, 1, true));
+            moves.addAll(straightMoves(board, piece, myPosition, 1, -1, true));
+            moves.addAll(straightMoves(board, piece, myPosition, -1, 1, true));
+            moves.addAll(straightMoves(board, piece, myPosition, -1, -1, true));
         }
         // KNIGHT
         if (piece.type == PieceType.KNIGHT) {
@@ -99,7 +109,10 @@ public class ChessPiece {
         }
         // ROOK
         if (piece.type == PieceType.ROOK) {
-            moves = straightMoves(board, piece, myPosition, 0);
+            moves.addAll(straightMoves(board, piece, myPosition, 1, 0, true));
+            moves.addAll(straightMoves(board, piece, myPosition, -1, 0, true));
+            moves.addAll(straightMoves(board, piece, myPosition, 0, 1, true));
+            moves.addAll(straightMoves(board, piece, myPosition, 0, -1, true));
         }
         // PAWN
         if (piece.type == PieceType.PAWN) {
@@ -192,6 +205,7 @@ public class ChessPiece {
 
     /**
      * Pawn help to add promotions
+     * added 1/27/26 for quality
      */
     private Collection<ChessMove> pawnCaptureHelp(ChessBoard board, ChessPiece piece, ChessPosition myPosition,
                                                 int checkRow, int checkCol) {
@@ -223,39 +237,6 @@ public class ChessPiece {
 
         moves.addAll(pawnCaptureHelp(board, piece, myPosition, checkRow, leftCol));
         moves.addAll(pawnCaptureHelp(board, piece, myPosition, checkRow, rightCol));
-        return moves;
-    }
-
-    /**
-     * Checks for king spaces
-     * added 1/27/26 from p0 implementation - updated for quality
-     */
-    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPiece piece, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
-        int currRow = myPosition.getRow();
-        int currCol = myPosition.getColumn();
-
-        int[][] possible = {{currRow - 1, currCol - 1}, {currRow - 1, currCol},
-                {currRow - 1, currCol + 1}, {currRow, currCol + 1},
-                {currRow, currCol - 1}, {currRow + 1, currCol},
-                {currRow + 1, currCol + 1}, {currRow + 1, currCol - 1}};
-
-        for (int i = 0; i < 8; i++) {
-            int checkRow = possible[i][0];
-            int checkCol = possible[i][1];
-
-            if (inBound(checkRow, checkCol)) {
-                ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
-                if (openPosition(board, checkPos)) {
-                    moves.add(new ChessMove(myPosition, checkPos, null));
-                } else {
-                    ChessPiece other = board.getPiece(checkPos);
-                    if (capturable(piece, other)) {
-                        moves.add(new ChessMove(myPosition, checkPos, null));
-                    }
-                }
-            }
-        }
         return moves;
     }
 
@@ -292,59 +273,36 @@ public class ChessPiece {
         return moves;
     }
 
-    private Collection<ChessMove> straightForward(ChessBoard board, ChessPiece piece, ChessPosition myPosition,
-                                                  int offset, int rowDirection, int colDirection) {
+    /**
+     * Checks for straight/diagonal spaces
+     * added 1/27/26 from p0 implementation - updated for quality
+     * updated 1/28/26 for conciseness/quality
+     */
+    private Collection<ChessMove> straightMoves(ChessBoard board, ChessPiece piece, ChessPosition myPosition,
+                                                int rowOffset, int colOffset, boolean slide) {
         Collection<ChessMove> moves = new ArrayList<>();
         int currRow = myPosition.getRow();
         int currCol = myPosition.getColumn();
 
-        for (int i = 1; i < 9; i++) {
-            int checkRow = currRow + (i * rowDirection);
-            int checkCol = currCol + (i * offset * colDirection);
+        int i = 1;
+        int checkRow = currRow + (i*rowOffset);
+        int checkCol = currCol + (i*colOffset);
 
-            if (inBound(checkRow, checkCol)) {
-                ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
-                if (openPosition(board, checkPos)) {
-                    moves.add(new ChessMove(myPosition, checkPos, null));
-                } else {
-                    ChessPiece other = board.getPiece(checkPos);
-                    if (capturable(piece, other)) {
-                        moves.add(new ChessMove(myPosition, checkPos, null));
-                    }
-                    break;
-                }
+        if (slide) {
+            while (inBound(checkRow, checkCol) && openPosition(board, new ChessPosition(checkRow, checkCol))) {
+                ChessPosition otherPos = new ChessPosition(currRow + (i*rowOffset), currCol + (i*colOffset));
+                moves.add(new ChessMove(myPosition, otherPos, null));
+                i++;
+                checkRow = currRow + (i*rowOffset);
+                checkCol = currCol + (i*colOffset);
             }
         }
-
-        for (int i = 1; i < 9; i++) {
-            int checkRow = currRow + (i * offset * rowDirection);
-            int checkCol = currCol - (i * colDirection);
-
-            if (inBound(checkRow, checkCol)) {
-                ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
-                if (openPosition(board, checkPos)) {
-                    moves.add(new ChessMove(myPosition, checkPos, null));
-                } else {
-                    ChessPiece other = board.getPiece(checkPos);
-                    if (capturable(piece, other)) {
-                        moves.add(new ChessMove(myPosition, checkPos, null));
-                    }
-                    break;
-                }
+        if (inBound(checkRow, checkCol)) {
+            ChessPosition otherPos = new ChessPosition(checkRow, checkCol);
+            if (openPosition(board, otherPos) || capturable(piece, board.getPiece(otherPos))) {
+                moves.add(new ChessMove(myPosition, otherPos, null));
             }
         }
-        return moves;
-    }
-
-    /**
-     * Checks for straight/diagonal spaces
-     * added 1/27/26 from p0 implementation - updated for quality
-     */
-    private Collection<ChessMove> straightMoves(ChessBoard board, ChessPiece piece, ChessPosition myPosition, int offset) {
-        Collection<ChessMove> moves = new ArrayList<>();
-
-        moves.addAll(straightForward(board, piece, myPosition, offset, 1, 1));
-        moves.addAll(straightForward(board, piece, myPosition, offset, -1, -1));
         return moves;
     }
 }
