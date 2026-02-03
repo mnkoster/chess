@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -10,7 +11,7 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    ChessBoard chess = new ChessBoard();
+    ChessBoard currBoard = new ChessBoard();
     TeamColor turn = TeamColor.WHITE;
 
     public ChessGame() {
@@ -33,6 +34,19 @@ public class ChessGame {
         turn = team;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ChessGame chessGame)) {
+            return false;
+        }
+        return Objects.equals(currBoard, chessGame.currBoard) && turn == chessGame.turn;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currBoard, turn);
+    }
+
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
@@ -47,12 +61,13 @@ public class ChessGame {
      * @param startPosition the piece to get valid moves for
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
+     * added 2/3/26 for phase 1 implementation - TO UPDATE
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece currPiece = chess.getPiece(startPosition);
+        ChessPiece currPiece = currBoard.getPiece(startPosition);
         if (currPiece == null) { return null; }
 
-        Collection<ChessMove> unfilteredMoves = currPiece.pieceMoves(chess, startPosition);
+        Collection<ChessMove> unfilteredMoves = currPiece.pieceMoves(currBoard, startPosition);
         return unfilteredMoves;
     }
 
@@ -61,9 +76,35 @@ public class ChessGame {
      *
      * @param move chess move to perform
      * @throws InvalidMoveException if move is invalid
+     * added 2/3/26 for phase 1 implementation - TO UPDATE
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPosition startPos = move.getStartPosition();
+        ChessPosition endPos = move.getEndPosition();
+        ChessPiece piece = currBoard.getPiece(startPos);
+        TeamColor currColor = getTeamTurn();
+        if ((piece == null) || (piece.getTeamColor() != currColor)) {
+            throw new InvalidMoveException("Invalid position: empty or wrong color piece");
+        }
+        Collection<ChessMove> validMoves = validMoves(startPos);
+        if (!validMoves.contains(move)) {
+            throw new InvalidMoveException("Not valid move!");
+        }
+
+        // Piece exists and is valid move; make move
+        ChessPiece.PieceType promoType = move.getPromotionPiece();
+        if (promoType != null) {
+            piece = new ChessPiece(piece.getTeamColor(), promoType);
+        }
+        currBoard.removePiece(startPos);
+        currBoard.addPiece(endPos, piece);
+
+        // Update team turn
+        if (currColor == TeamColor.WHITE) {
+            setTeamTurn(TeamColor.BLACK);
+        } else {
+            setTeamTurn(TeamColor.WHITE);
+        }
     }
 
     /**
@@ -71,9 +112,10 @@ public class ChessGame {
      *
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
+     * added 2/3/26 for phase 1 implementation - TO UPDATE
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return false;
     }
 
     /**
@@ -81,9 +123,10 @@ public class ChessGame {
      *
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
+     * added 2/3/26 for phase 1 implementation - TO UPDATE
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return false;
     }
 
     /**
@@ -92,26 +135,29 @@ public class ChessGame {
      *
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
+     * added 2/3/26 for phase 1 implementation - TO UPDATE
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return false;
     }
 
     /**
      * Sets this game's chessboard with a given board
      *
      * @param board the new board to use
+     * added 2/3/26 for phase 1 implementation
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.currBoard = board;
     }
 
     /**
      * Gets the current chessboard
      *
      * @return the chessboard
+     * added 2/3/26 for phase 1 implementation
      */
     public ChessBoard getBoard() {
-        return chess;
+        return currBoard;
     }
 }
