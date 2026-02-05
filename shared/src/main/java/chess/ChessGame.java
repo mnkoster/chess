@@ -13,11 +13,13 @@ import java.util.Objects;
  */
 public class ChessGame {
 
-    ChessBoard currBoard = new ChessBoard();
-    TeamColor turn = TeamColor.WHITE;
+    private ChessBoard currBoard;
+    private TeamColor turn;
 
     public ChessGame() {
-
+        currBoard = new ChessBoard();
+        currBoard.resetBoard();
+        turn = TeamColor.WHITE;
     }
 
     /**
@@ -85,7 +87,7 @@ public class ChessGame {
         Collection<ChessMove> unfilteredMoves = currPiece.pieceMoves(currBoard, startPosition);
 
         for (ChessMove move : unfilteredMoves) {
-            if (movePutsKingInCheck(startPosition, move, currPiece, getTeamTurn())) {
+            if (movePutsKingInCheck(startPosition, move, currPiece, currPiece.getTeamColor())) {
                 continue;
             }
             validatedMoves.add(move);
