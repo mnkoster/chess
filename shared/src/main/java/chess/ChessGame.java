@@ -72,7 +72,8 @@ public class ChessGame {
      * @param startPosition the piece to get valid moves for
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
-     * added 2/3/26 for phase 1 implementation - TO UPDATE
+     * added 2/3/26 for phase 1 implementation
+     * updated 2/4/26 for phase 1 implementation
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece currPiece = currBoard.getPiece(startPosition);
@@ -87,7 +88,7 @@ public class ChessGame {
      *
      * @param move chess move to perform
      * @throws InvalidMoveException if move is invalid
-     * added 2/3/26 for phase 1 implementation - TO UPDATE
+     * added 2/3/26 for phase 1 implementation
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPos = move.getStartPosition();
@@ -116,6 +117,20 @@ public class ChessGame {
     }
 
     /**
+     * Helper function to get piece moves
+     * added 2/4/26 for p1 implementation
+     */
+    private Collection<ChessMove> getMoves(int row, int col, TeamColor tryColor) {
+        ChessPosition tryPos = new ChessPosition(row, col);
+        ChessPiece piece = currBoard.getPiece(tryPos);
+
+        if (piece != null && piece.getTeamColor() == tryColor) {
+            return piece.pieceMoves(currBoard, tryPos);
+        }
+        return null;
+    }
+
+    /**
      * Helper function to find teamColor king
      * added 2/4/26 for p1 implementation
      */
@@ -140,7 +155,7 @@ public class ChessGame {
      *
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
-     * added 2/4/26 for phase 1 implementation
+     * added 2/4/26 for p1 implementation
      */
     public boolean isInCheck(TeamColor teamColor) {
         TeamColor opposingColor = opponentColor(teamColor);
@@ -148,15 +163,13 @@ public class ChessGame {
 
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
-                ChessPosition tryPos = new ChessPosition(i, j);
-                ChessPiece tryPiece = currBoard.getPiece(tryPos);
-
-                if (tryPiece != null && tryPiece.getTeamColor() == opposingColor) {
-                    Collection<ChessMove> moves = tryPiece.pieceMoves(currBoard, tryPos);
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(kingPos)) {
-                            return true;
-                        }
+                Collection<ChessMove> moves = getMoves(i, j, opposingColor);
+                if (moves == null) {
+                    continue;
+                }
+                for (ChessMove move : moves) {
+                    if (move.getEndPosition().equals(kingPos)) {
+                        return true;
                     }
                 }
             }
@@ -169,7 +182,7 @@ public class ChessGame {
      *
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
-     * added 2/4/26 for phase 1 implementation
+     * added 2/4/26 for p1 implementation
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         // return false if the king isn't in check
@@ -180,31 +193,29 @@ public class ChessGame {
         // see if any moves could put the king out of check
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
+                Collection<ChessMove> moves = getMoves(i, j, teamColor);
+                if (moves == null) { continue; }
                 ChessPosition startPos = new ChessPosition(i, j);
                 ChessPiece piece = currBoard.getPiece(startPos);
 
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(currBoard, startPos);
+                for (ChessMove move : moves) {
+                    ChessPosition endPos = move.getEndPosition();
+                    ChessPiece captured = currBoard.getPiece(endPos);
 
-                    for (ChessMove move : moves) {
-                        ChessPosition endPos = move.getEndPosition();
-                        ChessPiece captured = currBoard.getPiece(endPos);
+                    // simulate move
+                    currBoard.removePiece(startPos);
+                    currBoard.addPiece(endPos, piece);
+                    boolean stillInCheck = isInCheck(teamColor);
+                    // undo move
+                    currBoard.removePiece(endPos);
+                    currBoard.addPiece(startPos, piece);
+                    if (captured != null) {
+                        currBoard.addPiece(endPos, captured);
+                    }
 
-                        // simulate move
-                        currBoard.removePiece(startPos);
-                        currBoard.addPiece(endPos, piece);
-                        boolean stillInCheck = isInCheck(teamColor);
-                        // undo move
-                        currBoard.removePiece(endPos);
-                        currBoard.addPiece(startPos, piece);
-                        if (captured != null) {
-                            currBoard.addPiece(endPos, captured);
-                        }
-
-                        // found an escape move
-                        if (!stillInCheck) {
-                            return false;
-                        }
+                    // found an escape move
+                    if (!stillInCheck) {
+                        return false;
                     }
                 }
             }
@@ -219,7 +230,7 @@ public class ChessGame {
      *
      * @param teamColor which team to check for stalemate
      * @return True if the specified team is in stalemate, otherwise false
-     * added 2/3/26 for phase 1 implementation - TO UPDATE
+     * added 2/3/26 for p1 implementation - TO UPDATE
      */
     public boolean isInStalemate(TeamColor teamColor) {
         return false;
@@ -229,7 +240,7 @@ public class ChessGame {
      * Sets this game's chessboard with a given board
      *
      * @param board the new board to use
-     * added 2/3/26 for phase 1 implementation
+     * added 2/3/26 for p1 implementation
      */
     public void setBoard(ChessBoard board) {
         this.currBoard = board;
@@ -239,7 +250,7 @@ public class ChessGame {
      * Gets the current chessboard
      *
      * @return the chessboard
-     * added 2/3/26 for phase 1 implementation
+     * added 2/3/26 for p1 implementation
      */
     public ChessBoard getBoard() {
         return currBoard;
