@@ -25,9 +25,7 @@ public class ChessGame {
     /**
      * @return Which team's turn it is
      */
-    public TeamColor getTeamTurn() {
-        return turn;
-    }
+    public TeamColor getTeamTurn() { return turn; }
 
     /**
      * Set's which teams turn it is
@@ -256,7 +254,22 @@ public class ChessGame {
      * added 2/3/26 for p1 implementation - TO UPDATE
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return false;
+        if (isInCheck(teamColor)) {
+            return false;
+        }
+        Collection<ChessMove> availableMoves = new ArrayList<>();
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition tryPos = new ChessPosition(i, j);
+                ChessPiece piece = currBoard.getPiece(tryPos);
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> posMoves = validMoves(tryPos);
+                    if (posMoves == null) { continue; }
+                    availableMoves.addAll(posMoves);
+                }
+            }
+        }
+        return (availableMoves.isEmpty());
     }
 
     /**
