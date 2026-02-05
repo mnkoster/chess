@@ -79,7 +79,7 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece currPiece = currBoard.getPiece(startPosition);
-        if (currPiece == null || currPiece.getTeamColor() != getTeamTurn()) { return null; }
+        if (currPiece == null) { return null; }
 
         Collection<ChessMove> validatedMoves = new ArrayList<>();
         Collection<ChessMove> unfilteredMoves = currPiece.pieceMoves(currBoard, startPosition);
@@ -109,6 +109,9 @@ public class ChessGame {
             throw new InvalidMoveException("Invalid position: empty or wrong color piece");
         }
         Collection<ChessMove> validMoves = validMoves(startPos);
+        if (validMoves.isEmpty()) {
+            throw new InvalidMoveException("No valid moves");
+        }
         if (!validMoves.contains(move)) {
             throw new InvalidMoveException("Not valid move!");
         }
