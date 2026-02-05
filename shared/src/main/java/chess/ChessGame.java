@@ -56,6 +56,17 @@ public class ChessGame {
     }
 
     /**
+     * helper function to get opposing color
+     * added 2/4/26 for p1 implementation
+     */
+    private TeamColor opponentColor(TeamColor teamColor) {
+        if (teamColor == TeamColor.WHITE) {
+            return TeamColor.BLACK;
+        }
+        return TeamColor.WHITE;
+    }
+
+    /**
      * Gets a valid moves for a piece at the given location
      *
      * @param startPosition the piece to get valid moves for
@@ -100,11 +111,28 @@ public class ChessGame {
         currBoard.addPiece(endPos, piece);
 
         // Update team turn
-        if (currColor == TeamColor.WHITE) {
-            setTeamTurn(TeamColor.BLACK);
-        } else {
-            setTeamTurn(TeamColor.WHITE);
+        TeamColor opposingColor = opponentColor(currColor);
+        setTeamTurn(opposingColor);
+    }
+
+    /**
+     * Helper function to find teamColor king
+     * added 2/4/26 for p1 implementation
+     */
+    private ChessPosition findKing(TeamColor teamColor) {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition tryPos = new ChessPosition(i, j);
+                ChessPiece tryPiece = currBoard.getPiece(tryPos);
+
+                if (tryPiece != null &&
+                        tryPiece.getTeamColor() == teamColor &&
+                        tryPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                    return tryPos;
+                }
+            }
         }
+        return null;
     }
 
     /**
@@ -112,9 +140,27 @@ public class ChessGame {
      *
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
-     * added 2/3/26 for phase 1 implementation - TO UPDATE
+     * added 2/4/26 for phase 1 implementation
      */
     public boolean isInCheck(TeamColor teamColor) {
+        TeamColor opposingColor = opponentColor(teamColor);
+        ChessPosition kingPos = findKing(teamColor);
+
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition tryPos = new ChessPosition(i, j);
+                ChessPiece tryPiece = currBoard.getPiece(tryPos);
+
+                if (tryPiece != null && tryPiece.getTeamColor() == opposingColor) {
+                    Collection<ChessMove> moves = tryPiece.pieceMoves(currBoard, tryPos);
+                    for (ChessMove move : moves) {
+                        if (move.getEndPosition().equals(kingPos)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -123,10 +169,48 @@ public class ChessGame {
      *
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
-     * added 2/3/26 for phase 1 implementation - TO UPDATE
+     * added 2/4/26 for phase 1 implementation
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return false;
+        // return false if the king isn't in check
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
+
+        // see if any moves could put the king out of check
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition startPos = new ChessPosition(i, j);
+                ChessPiece piece = currBoard.getPiece(startPos);
+
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> moves = piece.pieceMoves(currBoard, startPos);
+
+                    for (ChessMove move : moves) {
+                        ChessPosition endPos = move.getEndPosition();
+                        ChessPiece captured = currBoard.getPiece(endPos);
+
+                        // simulate move
+                        currBoard.removePiece(startPos);
+                        currBoard.addPiece(endPos, piece);
+                        boolean stillInCheck = isInCheck(teamColor);
+                        // undo move
+                        currBoard.removePiece(endPos);
+                        currBoard.addPiece(startPos, piece);
+                        if (captured != null) {
+                            currBoard.addPiece(endPos, captured);
+                        }
+
+                        // found an escape move
+                        if (!stillInCheck) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        // is checkmate if the function hasn't returned above
+        return true;
     }
 
     /**
