@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -77,10 +79,18 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece currPiece = currBoard.getPiece(startPosition);
-        if (currPiece == null) { return null; }
+        if (currPiece == null || currPiece.getTeamColor() != getTeamTurn()) { return null; }
 
+        Collection<ChessMove> validatedMoves = new ArrayList<>();
         Collection<ChessMove> unfilteredMoves = currPiece.pieceMoves(currBoard, startPosition);
-        return unfilteredMoves;
+
+        for (ChessMove move : unfilteredMoves) {
+            if (movePutsKingInCheck(startPosition, move, currPiece, getTeamTurn())) {
+                continue;
+            }
+            validatedMoves.add(move);
+        }
+        return validatedMoves;
     }
 
     /**
@@ -128,6 +138,28 @@ public class ChessGame {
             return piece.pieceMoves(currBoard, tryPos);
         }
         return null;
+    }
+
+    /**
+     * Helper function to simulate move
+     * added 2/4/26 for p1 implementation
+     */
+    private boolean movePutsKingInCheck(ChessPosition startPos, ChessMove move, ChessPiece piece, TeamColor teamColor) {
+        ChessPosition endPos = move.getEndPosition();
+        ChessPiece captured = currBoard.getPiece(endPos);
+        // simulate move
+        currBoard.removePiece(startPos);
+        currBoard.addPiece(endPos, piece);
+        boolean inCheck = isInCheck(teamColor);
+        // undo move
+        currBoard.removePiece(endPos);
+        currBoard.addPiece(startPos, piece);
+        if (captured != null) {
+            currBoard.addPiece(endPos, captured);
+        }
+
+        // return if it found an escape move
+        return inCheck;
     }
 
     /**
@@ -199,23 +231,9 @@ public class ChessGame {
                 ChessPiece piece = currBoard.getPiece(startPos);
 
                 for (ChessMove move : moves) {
-                    ChessPosition endPos = move.getEndPosition();
-                    ChessPiece captured = currBoard.getPiece(endPos);
-
-                    // simulate move
-                    currBoard.removePiece(startPos);
-                    currBoard.addPiece(endPos, piece);
-                    boolean stillInCheck = isInCheck(teamColor);
-                    // undo move
-                    currBoard.removePiece(endPos);
-                    currBoard.addPiece(startPos, piece);
-                    if (captured != null) {
-                        currBoard.addPiece(endPos, captured);
-                    }
-
                     // found an escape move
-                    if (!stillInCheck) {
-                        return false;
+                    if (!movePutsKingInCheck(startPos, move, piece, teamColor)) {
+                       return false;
                     }
                 }
             }
