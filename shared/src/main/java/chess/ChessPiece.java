@@ -16,6 +16,8 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
 
+    private boolean pieceMoved = false;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
@@ -215,7 +217,7 @@ public class ChessPiece {
      * added 1/27/26 for quality
      */
     private Collection<ChessMove> pawnCaptureHelp(ChessBoard board, ChessPiece piece, ChessPosition myPosition,
-                                                int checkRow, int checkCol) {
+                                                  int checkRow, int checkCol) {
         Collection<ChessMove> moves = new ArrayList<>();
         if (inBound(checkRow, checkCol)) {
             ChessPosition checkPos = new ChessPosition(checkRow, checkCol);
@@ -292,16 +294,16 @@ public class ChessPiece {
         int currCol = myPosition.getColumn();
 
         int i = 1;
-        int checkRow = currRow + (i*rowOffset);
-        int checkCol = currCol + (i*colOffset);
+        int checkRow = currRow + (i * rowOffset);
+        int checkCol = currCol + (i * colOffset);
 
         if (slide) {
             while (inBound(checkRow, checkCol) && openPosition(board, new ChessPosition(checkRow, checkCol))) {
-                ChessPosition otherPos = new ChessPosition(currRow + (i*rowOffset), currCol + (i*colOffset));
+                ChessPosition otherPos = new ChessPosition(currRow + (i * rowOffset), currCol + (i * colOffset));
                 moves.add(new ChessMove(myPosition, otherPos, null));
                 i++;
-                checkRow = currRow + (i*rowOffset);
-                checkCol = currCol + (i*colOffset);
+                checkRow = currRow + (i * rowOffset);
+                checkCol = currCol + (i * colOffset);
             }
         }
         if (inBound(checkRow, checkCol)) {
@@ -311,5 +313,19 @@ public class ChessPiece {
             }
         }
         return moves;
+    }
+
+    /*
+     ********************************************************************************************
+     ************************************* GET/SET CASTLING FUNCTIONS ***************************
+     ********************************************************************************************
+     */
+
+    public boolean getPieceMoved() {
+        return !pieceMoved;
+    }
+
+    public void setPieceMoved(boolean moved) {
+        this.pieceMoved = moved;
     }
 }

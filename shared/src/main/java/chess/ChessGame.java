@@ -15,14 +15,7 @@ public class ChessGame {
     private ChessBoard currBoard;
     private TeamColor turn;
 
-    // Extra Credit Variables - Castling
-    private boolean whiteKingMoved = false;
-    private boolean blackKingMoved = false;
-    private boolean whiteKingsideRookMoved = false;
-    private boolean whiteQueensideRookMoved = false;
-    private boolean blackKingsideRookMoved = false;
-    private boolean blackQueensideRookMoved = false;
-    // Extra Credit Variables - En Passant
+    // Extra Credit Variable - En Passant
     private ChessPosition enPassantTarget;
 
     public ChessGame() {
@@ -78,6 +71,27 @@ public class ChessGame {
     }
 
     /**
+     * Square is under attack
+     * added 2/6/26 for castling
+     */
+    private boolean squareUnderAttack(ChessPosition pos, TeamColor byTeam) {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                Collection<ChessMove> moves = getMoves(i, j, byTeam);
+                if (moves == null) continue;
+
+                for (ChessMove move : moves) {
+                    if (move.getEndPosition().equals(pos)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+
+    /**
      * Gets a valid moves for a piece at the given location
      *
      * @param startPosition the piece to get valid moves for
@@ -106,6 +120,66 @@ public class ChessGame {
             // Pawn must be next to the en passant pawn
             if (Math.abs(startPosition.getColumn() - target.getColumn()) == 1) {
                 validatedMoves.add(new ChessMove(startPosition, target, null));
+            }
+        }
+
+        // Castling
+        if (currPiece.getPieceType() == ChessPiece.PieceType.KING && currPiece.getPieceMoved()) {
+            TeamColor team = currPiece.getTeamColor();
+            TeamColor opponent = opponentColor(team);
+            int row = (team == TeamColor.WHITE) ? 1 : 8;
+
+            // King must not be in check
+            if (!isInCheck(team)) {
+
+                // ======================
+                // Kingside castling
+                // ======================
+                ChessPosition rookPosK = new ChessPosition(row, 8);
+                ChessPiece rookK = currBoard.getPiece(rookPosK);
+
+                if (rookK != null &&
+                        rookK.getPieceType() == ChessPiece.PieceType.ROOK &&
+                        rookK.getPieceMoved()) {
+
+                    ChessPosition f = new ChessPosition(row, 6);
+                    ChessPosition g = new ChessPosition(row, 7);
+
+                    if (currBoard.getPiece(f) == null &&
+                            currBoard.getPiece(g) == null &&
+                            squareUnderAttack(f, opponent) &&
+                            squareUnderAttack(g, opponent)) {
+
+                        validatedMoves.add(
+                                new ChessMove(startPosition, g, null)
+                        );
+                    }
+                }
+
+                // ======================
+                // Queenside castling
+                // ======================
+                ChessPosition rookPosQ = new ChessPosition(row, 1);
+                ChessPiece rookQ = currBoard.getPiece(rookPosQ);
+
+                if (rookQ != null &&
+                        rookQ.getPieceType() == ChessPiece.PieceType.ROOK &&
+                        rookQ.getPieceMoved()) {
+                    ChessPosition d = new ChessPosition(row, 4);
+                    ChessPosition c = new ChessPosition(row, 3);
+                    ChessPosition b = new ChessPosition(row, 2);
+
+                    if (currBoard.getPiece(d) == null &&
+                            currBoard.getPiece(c) == null &&
+                            currBoard.getPiece(b) == null &&
+                            squareUnderAttack(d, opponent) &&
+                            squareUnderAttack(c, opponent)) {
+
+                        validatedMoves.add(
+                                new ChessMove(startPosition, c, null)
+                        );
+                    }
+                }
             }
         }
         return validatedMoves;
@@ -155,22 +229,8 @@ public class ChessGame {
         }
 
         // Castling updates
-        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            if (piece.getTeamColor() == TeamColor.WHITE) {
-                whiteKingMoved = true;
-            } else {
-                blackKingMoved = true;
-            }
-        }
-
-        if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
-            if (piece.getTeamColor() == TeamColor.WHITE) {
-                if (startPos.equals(new ChessPosition(1, 1))) whiteQueensideRookMoved = true;
-                if (startPos.equals(new ChessPosition(1, 8))) whiteKingsideRookMoved = true;
-            } else {
-                if (startPos.equals(new ChessPosition(8, 1))) blackQueensideRookMoved = true;
-                if (startPos.equals(new ChessPosition(8, 8))) blackKingsideRookMoved = true;
-            }
+        if (piece.getPieceType() == ChessPiece.PieceType.KING || piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+            piece.setPieceMoved(true);
         }
 
         // Phase 1 existing implementation
@@ -191,6 +251,32 @@ public class ChessGame {
             if (Math.abs(startRow - endRow) == 2) {
                 int passedRow = (startRow + endRow) / 2;
                 enPassantTarget = new ChessPosition(passedRow, startPos.getColumn());
+            }
+        }
+
+        // Castling moving rook
+        if (piece.getPieceType() == ChessPiece.PieceType.KING &&
+                Math.abs(startPos.getColumn() - endPos.getColumn()) == 2) {
+
+            int row = startPos.getRow();
+
+            if (endPos.getColumn() == 7) { // Kingside
+                ChessPosition rookStart = new ChessPosition(row, 8);
+                ChessPosition rookEnd = new ChessPosition(row, 6);
+
+                ChessPiece rook = currBoard.getPiece(rookStart);
+                currBoard.removePiece(rookStart);
+                currBoard.addPiece(rookEnd, rook);
+                rook.setPieceMoved(true);
+
+            } else { // Queenside
+                ChessPosition rookStart = new ChessPosition(row, 1);
+                ChessPosition rookEnd = new ChessPosition(row, 4);
+
+                ChessPiece rook = currBoard.getPiece(rookStart);
+                currBoard.removePiece(rookStart);
+                currBoard.addPiece(rookEnd, rook);
+                rook.setPieceMoved(true);
             }
         }
     }
