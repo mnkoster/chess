@@ -15,6 +15,16 @@ public class ChessGame {
     private ChessBoard currBoard;
     private TeamColor turn;
 
+    // Extra Credit Variables - Castling
+    private boolean whiteKingMoved = false;
+    private boolean blackKingMoved = false;
+    private boolean whiteKingsideRookMoved = false;
+    private boolean whiteQueensideRookMoved = false;
+    private boolean blackKingsideRookMoved = false;
+    private boolean blackQueensideRookMoved = false;
+    // Extra Credit Variables - En Passant
+    private ChessPosition enPassantTarget;
+
     public ChessGame() {
         currBoard = new ChessBoard();
         currBoard.resetBoard();
@@ -89,6 +99,15 @@ public class ChessGame {
             }
             validatedMoves.add(move);
         }
+
+        // En passant
+        if (enPassantTarget != null) {
+            ChessPosition target = enPassantTarget;
+            // Pawn must be next to the en passant pawn
+            if (Math.abs(startPosition.getColumn() - target.getColumn()) == 1) {
+                validatedMoves.add(new ChessMove(startPosition, target, null));
+            }
+        }
         return validatedMoves;
     }
 
@@ -120,12 +139,60 @@ public class ChessGame {
         if (promoType != null) {
             piece = new ChessPiece(piece.getTeamColor(), promoType);
         }
+
+        // Handle enpassant updates
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN &&
+                endPos.equals(enPassantTarget)) {
+
+            // Captured pawn is behind the target square
+            int capturedRow = (piece.getTeamColor() == TeamColor.WHITE)
+                    ? endPos.getRow() - 1
+                    : endPos.getRow() + 1;
+
+            ChessPosition capturedPawnPos =
+                    new ChessPosition(capturedRow, endPos.getColumn());
+            currBoard.removePiece(capturedPawnPos);
+        }
+
+        // Castling updates
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            if (piece.getTeamColor() == TeamColor.WHITE) {
+                whiteKingMoved = true;
+            } else {
+                blackKingMoved = true;
+            }
+        }
+
+        if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+            if (piece.getTeamColor() == TeamColor.WHITE) {
+                if (startPos.equals(new ChessPosition(1, 1))) whiteQueensideRookMoved = true;
+                if (startPos.equals(new ChessPosition(1, 8))) whiteKingsideRookMoved = true;
+            } else {
+                if (startPos.equals(new ChessPosition(8, 1))) blackQueensideRookMoved = true;
+                if (startPos.equals(new ChessPosition(8, 8))) blackKingsideRookMoved = true;
+            }
+        }
+
+        // Phase 1 existing implementation
         currBoard.removePiece(startPos);
         currBoard.addPiece(endPos, piece);
 
         // Update team turn
         TeamColor opposingColor = opponentColor(currColor);
         setTeamTurn(opposingColor);
+
+        // Detect en passant for opposing team
+        enPassantTarget = null;
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            int startRow = startPos.getRow();
+            int endRow = endPos.getRow();
+
+            // Pawn moved two squares
+            if (Math.abs(startRow - endRow) == 2) {
+                int passedRow = (startRow + endRow) / 2;
+                enPassantTarget = new ChessPosition(passedRow, startPos.getColumn());
+            }
+        }
     }
 
     /**
