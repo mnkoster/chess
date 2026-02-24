@@ -78,7 +78,7 @@ public class ChessGame {
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 Collection<ChessMove> moves = getMoves(i, j, byTeam);
-                if (moves == null) continue;
+                if (moves == null) { continue; }
 
                 for (ChessMove move : moves) {
                     if (move.getEndPosition().equals(pos)) {
