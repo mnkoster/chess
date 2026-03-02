@@ -24,15 +24,18 @@ public class Server {
         // DAOs
         MemoryUserDAO userDAO = new MemoryUserDAO();
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        MemoryGameDAO gameDAO = new MemoryGameDAO();
         // Service
         AuthService authService = new AuthService(userDAO, authDAO);
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
         // Handler
         RegisterHandler registerHandler = new RegisterHandler(authService);
         LoginHandler loginHandler = new LoginHandler(authService);
+        ClearHandler clearHandler = new ClearHandler(clearService);
         // Route
         javalin.post("/user", registerHandler::handle);
         javalin.post("/session", loginHandler::handle);
-
+        javalin.delete("/db", clearHandler::handle);
         // Exception
         javalin.exception(BadRequestResponse.class, (e, ctx) -> {
             ctx.status(400).json(new ErrorResponse(e.getMessage()));
