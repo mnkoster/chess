@@ -2,7 +2,6 @@ package server;
 
 import io.javalin.*;
 import dataaccess.*;
-import io.javalin.http.BadRequestResponse;
 import io.javalin.json.JavalinGson;
 import service.*;
 import handler.*;
@@ -29,18 +28,24 @@ public class Server {
         MemoryUserDAO userDAO = new MemoryUserDAO();
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
+
         // Service
-        AuthService authService = new AuthService(userDAO, authDAO);
+        UserService userService = new UserService(userDAO, authDAO);
         ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+
         // Handler
-        RegisterHandler registerHandler = new RegisterHandler(authService);
-        LoginHandler loginHandler = new LoginHandler(authService);
+        RegisterHandler registerHandler = new RegisterHandler(userService);
+        LoginHandler loginHandler = new LoginHandler(userService);
+        LogoutHandler logoutHandler = new LogoutHandler(userService);
         ClearHandler clearHandler = new ClearHandler(clearService);
+
         // Route
         javalin.post("/user", registerHandler::handle);
         javalin.post("/session", loginHandler::handle);
+        javalin.delete("/session", logoutHandler::handle);
         javalin.delete("/db", clearHandler::handle);
-        // Exception
+
+        // Exceptions
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).json(new ErrorResponse(e.getMessage()));
         }); // 400: bad request
