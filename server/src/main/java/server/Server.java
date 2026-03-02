@@ -2,15 +2,22 @@ package server;
 
 import io.javalin.*;
 import dataaccess.*;
+import io.javalin.json.JavalinGson;
 import service.*;
 import handler.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class Server {
 
     private final Javalin javalin;
 
     public Server() {
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        javalin = Javalin.create(config -> {
+            config.staticFiles.add("web");
+            config.jsonMapper(new JavalinGson(gson, false));
+        });
 
         // Register your endpoints and exception handlers here.
         // DAOs
