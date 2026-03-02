@@ -9,6 +9,10 @@ import handler.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * 2/28/26: added some logic
+ * 3/1/26: added register, login, clear // service, handler, exceptions
+ */
 public class Server {
 
     private final Javalin javalin;
@@ -37,7 +41,7 @@ public class Server {
         javalin.post("/session", loginHandler::handle);
         javalin.delete("/db", clearHandler::handle);
         // Exception
-        javalin.exception(BadRequestResponse.class, (e, ctx) -> {
+        javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).json(new ErrorResponse(e.getMessage()));
         }); // 400: bad request
         javalin.exception(UnauthorizedException.class, (e, ctx) -> {

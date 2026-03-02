@@ -3,7 +3,7 @@ package service;
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 import handler.AlreadyTakenException;
-import io.javalin.http.BadRequestResponse;
+import handler.BadRequestException;
 import model.UserData;
 import model.AuthData;
 import results.LoginResult;
@@ -40,7 +40,7 @@ public class AuthService {
 
     public RegisterResult register(String username, String password, String email) {
         if (username == null || password == null || email == null) {
-            throw new BadRequestResponse("Error: bad request");
+            throw new BadRequestException("Error: bad request");
         }
 
         if (userDAO.getUser(username) != null) {
