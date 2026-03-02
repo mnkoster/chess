@@ -2,10 +2,13 @@ package service;
 
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
+import handler.AlreadyTakenException;
+import io.javalin.http.BadRequestResponse;
 import model.UserData;
 import model.AuthData;
 import results.LoginResult;
 import dataaccess.UnauthorizedException;
+import results.RegisterResult;
 
 import java.util.UUID;
 
@@ -33,5 +36,23 @@ public class AuthService {
         AuthData auth = new AuthData(token, username);
         authDAO.createAuth(auth);
         return new LoginResult(username, token);
+    }
+
+    public RegisterResult register(String username, String password, String email) {
+        if (username == null || password == null || email == null) {
+            throw new BadRequestResponse("Error: bad request");
+        }
+
+        if (userDAO.getUser(username) != null) {
+            throw new AlreadyTakenException("Error: username already taken");
+        }
+
+        UserData user = new UserData(username, password, email);
+        userDAO.addUser(user);
+
+        String token = UUID.randomUUID().toString();
+        AuthData auth = new AuthData(token, username);
+        authDAO.createAuth(auth);
+        return new RegisterResult(username, token);
     }
 }
