@@ -32,17 +32,20 @@ public class Server {
         // Service
         UserService userService = new UserService(userDAO, authDAO);
         ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        GameService gameService = new GameService(gameDAO, authDAO);
 
         // Handler
         RegisterHandler registerHandler = new RegisterHandler(userService);
         LoginHandler loginHandler = new LoginHandler(userService);
         LogoutHandler logoutHandler = new LogoutHandler(userService);
+        ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
         ClearHandler clearHandler = new ClearHandler(clearService);
 
         // Route
         javalin.post("/user", registerHandler::handle);
         javalin.post("/session", loginHandler::handle);
         javalin.delete("/session", logoutHandler::handle);
+        javalin.get("/game", listGamesHandler::handle);
         javalin.delete("/db", clearHandler::handle);
 
         // Exceptions
