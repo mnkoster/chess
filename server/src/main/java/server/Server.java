@@ -39,6 +39,7 @@ public class Server {
         LoginHandler loginHandler = new LoginHandler(userService);
         LogoutHandler logoutHandler = new LogoutHandler(userService);
         ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
+        CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
         ClearHandler clearHandler = new ClearHandler(clearService);
 
         // Route
@@ -46,6 +47,7 @@ public class Server {
         javalin.post("/session", loginHandler::handle);
         javalin.delete("/session", logoutHandler::handle);
         javalin.get("/game", listGamesHandler::handle);
+        javalin.post("/game", createGameHandler::handle);
         javalin.delete("/db", clearHandler::handle);
 
         // Exceptions

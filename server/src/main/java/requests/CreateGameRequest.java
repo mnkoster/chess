@@ -1,4 +1,9 @@
 package requests;
 
-public class CreateGameRequest {
-}
+/**
+ * 3/2/26: added for p3 apis (games)
+ * @param gameName
+ */
+public record CreateGameRequest(
+        String gameName
+) {}
