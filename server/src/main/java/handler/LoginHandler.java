@@ -18,7 +18,6 @@ public class LoginHandler {
 
     public void handle(Context ctx) {
         LoginRequest request = ctx.bodyAsClass(LoginRequest.class);
-
         if (request.username() == null || request.password() == null) {
             ctx.status(400).json(new ErrorResponse("Error: bad request"));
             return;
@@ -27,7 +26,6 @@ public class LoginHandler {
                 request.username(),
                 request.password()
         );
-
         ctx.status(200).json(result);
     }
 }

@@ -66,6 +66,11 @@ public class GameService {
         if (game == null) {
             throw new BadRequestException("Error: bad request");
         }
+        if (playerColor == null ||
+        !playerColor.equalsIgnoreCase("WHITE") &&
+        !playerColor.equalsIgnoreCase("BLACK")) {
+            throw new BadRequestException("Error: bad request");
+        }
         if (playerColor.equalsIgnoreCase("WHITE")) {
             if (game.whiteUsername() != null) {
                 throw new AlreadyTakenException("Error: already taken");
@@ -89,6 +94,7 @@ public class GameService {
                     new ChessGame()
             );
         }
+
         gameDAO.updateGame(game);
     }
 }

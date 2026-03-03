@@ -18,7 +18,6 @@ public class CreateGameHandler {
     }
 
     public void handle(Context ctx) {
-
         String authToken = ctx.header("Authorization");
         CreateGameRequest request = ctx.bodyAsClass(CreateGameRequest.class);
         int gameID = gameService.createGame(authToken, request.gameName());

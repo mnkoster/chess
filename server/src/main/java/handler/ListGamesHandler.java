@@ -16,7 +16,6 @@ public class ListGamesHandler {
     }
 
     public void handle(Context ctx) {
-
         String authToken = ctx.header("Authorization");
         var games = gameService.getListGames(authToken);
         ctx.status(200).json(Map.of("games", games));

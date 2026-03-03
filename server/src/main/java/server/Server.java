@@ -3,7 +3,6 @@ package server;
 import io.javalin.*;
 import dataaccess.*;
 import io.javalin.json.JavalinGson;
-import requests.JoinGameRequest;
 import service.*;
 import handler.*;
 import com.google.gson.Gson;
@@ -24,7 +23,6 @@ public class Server {
             config.jsonMapper(new JavalinGson(gson, false));
         });
 
-        // Register your endpoints and exception handlers here.
         // DAOs
         MemoryUserDAO userDAO = new MemoryUserDAO();
         MemoryAuthDAO authDAO = new MemoryAuthDAO();

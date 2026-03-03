@@ -13,7 +13,7 @@ import results.RegisterResult;
 import java.util.UUID;
 
 /**
- * 3/1/26: Added AuthService and login() for phase 3 apis
+ * 3/1/26: added for p3 apis (AuthService, login, logout)
  */
 public class UserService {
 

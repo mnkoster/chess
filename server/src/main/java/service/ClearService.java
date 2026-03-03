@@ -4,6 +4,9 @@ import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 
+/**
+ * 3/1/26: added for p3 apis (clear)
+ */
 public class ClearService {
 
     private final UserDAO userDAO;
