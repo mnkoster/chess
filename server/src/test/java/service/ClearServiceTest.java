@@ -13,7 +13,7 @@ public class ClearServiceTest {
     private static GameService gameService;
     private static UserService userService;
     private static ClearService clearService;
-    private static String PLAYER1_VALID_TOKEN;
+    private static String playerValidToken1;
 
     @BeforeEach
     public void setup() {
@@ -24,18 +24,18 @@ public class ClearServiceTest {
         userService = new UserService(userDAO, authDAO);
         clearService = new ClearService(userDAO, authDAO, gameDAO);
 
-        String USERNAME = "player1";
-        String PASSWORD = "player1password";
-        String EMAIL = "player1@email.em";
-        userService.register(USERNAME, PASSWORD, EMAIL);
-        LoginResult login = userService.login(USERNAME, PASSWORD);
-        PLAYER1_VALID_TOKEN = login.authToken();
+        String username = "player1";
+        String password = "player1password";
+        String email = "player1@email.em";
+        userService.register(username, password, email);
+        LoginResult login = userService.login(username, password);
+        playerValidToken1 = login.authToken();
 
-        gameService.createGame(PLAYER1_VALID_TOKEN, "game1");
-        gameService.createGame(PLAYER1_VALID_TOKEN, "game2");
-        int gameID = gameService.createGame(PLAYER1_VALID_TOKEN, "game3");
+        gameService.createGame(playerValidToken1, "game1");
+        gameService.createGame(playerValidToken1, "game2");
+        int gameID = gameService.createGame(playerValidToken1, "game3");
 
-        gameService.joinGame(PLAYER1_VALID_TOKEN, gameID, "WHITE");
+        gameService.joinGame(playerValidToken1, gameID, "WHITE");
     }
 
     @Test
@@ -44,6 +44,6 @@ public class ClearServiceTest {
 
         assertTrue(gameDAO.getListGames().isEmpty(), "Games should be empty");
         assertThrows(UnauthorizedException.class, () -> userService.login("player1", "player1password"));
-        assertThrows(UnauthorizedException.class, () -> gameService.getListGames(PLAYER1_VALID_TOKEN));
+        assertThrows(UnauthorizedException.class, () -> gameService.getListGames(playerValidToken1));
     }
 }
