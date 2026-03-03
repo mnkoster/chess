@@ -12,5 +12,7 @@ import java.util.Map;
 public interface GameDAO {
     Collection<GameData> getListGames();
     int createGame(String gameName);
+    GameData getGame(int gameID);
+    void updateGame(GameData game);
     void clear();
 }

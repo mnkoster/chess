@@ -3,6 +3,7 @@ package server;
 import io.javalin.*;
 import dataaccess.*;
 import io.javalin.json.JavalinGson;
+import requests.JoinGameRequest;
 import service.*;
 import handler.*;
 import com.google.gson.Gson;
@@ -40,6 +41,7 @@ public class Server {
         LogoutHandler logoutHandler = new LogoutHandler(userService);
         ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
         CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
+        JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
         ClearHandler clearHandler = new ClearHandler(clearService);
 
         // Route
@@ -48,6 +50,7 @@ public class Server {
         javalin.delete("/session", logoutHandler::handle);
         javalin.get("/game", listGamesHandler::handle);
         javalin.post("/game", createGameHandler::handle);
+        javalin.put("/game", joinGameHandler::handle);
         javalin.delete("/db", clearHandler::handle);
 
         // Exceptions
