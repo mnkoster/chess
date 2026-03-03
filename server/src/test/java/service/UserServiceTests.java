@@ -7,13 +7,10 @@ import org.junit.jupiter.api.Test;
 import results.LoginResult;
 import results.RegisterResult;
 
-import java.util.Collection;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTests {
 
-    private UserDAO userDAO;
     private AuthDAO authDAO;
     private static UserService userService;
     private String playerValidToken1;
@@ -23,7 +20,7 @@ public class UserServiceTests {
 
     @BeforeEach
     public void setup() {
-        userDAO = new MemoryUserDAO();
+        UserDAO userDAO = new MemoryUserDAO();
         authDAO = new MemoryAuthDAO();
         userService = new UserService(userDAO, authDAO);
         username = "player1";
@@ -44,26 +41,46 @@ public class UserServiceTests {
         String password2 = "password2";
         userService.register(username, password, email);
         assertThrows(AlreadyTakenException.class, () ->
-                userService.register(username, password, email));
+                userService.register(username, password2, email));
     }
 
     @Test
     public void loginPositive() {
+        RegisterResult result = userService.register(username, password, email);
+        playerValidToken1 = result.authToken();
 
+        LoginResult login = userService.login(username, password);
+        playerValidToken1 = login.authToken();
+        assertEquals(playerValidToken1, authDAO.getAuth(playerValidToken1).authToken());
     }
 
     @Test
     public void loginNegative() {
+        RegisterResult result = userService.register(username, password, email);
+        playerValidToken1 = result.authToken();
 
+        assertThrows(UnauthorizedException.class, () ->
+                userService.login(username, "wrongPassword"));
     }
 
     @Test
     public void logoutPositive() {
-
+        RegisterResult result = userService.register(username, password, email);
+        playerValidToken1 = result.authToken();
+        LoginResult login = userService.login(username, password);
+        playerValidToken1 = login.authToken();
+        userService.logout(playerValidToken1);
+        assertNull(authDAO.getAuth(playerValidToken1));
     }
 
     @Test
     public void logoutNegative() {
+        RegisterResult result = userService.register(username, password, email);
+        playerValidToken1 = result.authToken();
+        LoginResult login = userService.login(username, password);
+        playerValidToken1 = login.authToken();
 
+        assertThrows(UnauthorizedException.class, () ->
+                userService.logout("notAValidToken"));
     }
 }
