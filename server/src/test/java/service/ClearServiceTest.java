@@ -39,7 +39,7 @@ public class ClearServiceTest {
     }
 
     @Test
-    public void clear_positive() {
+    public void clearPositive() {
         clearService.clear();
 
         assertTrue(gameDAO.getListGames().isEmpty(), "Games should be empty");
