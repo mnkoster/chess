@@ -1,5 +1,6 @@
 package handler;
 
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import requests.LoginRequest;
 import results.LoginResult;
@@ -16,7 +17,7 @@ public class LoginHandler {
         this.userService = userService;
     }
 
-    public void handle(Context ctx) {
+    public void handle(Context ctx) throws DataAccessException {
         LoginRequest request = ctx.bodyAsClass(LoginRequest.class);
         if (request.username() == null || request.password() == null) {
             ctx.status(400).json(new ErrorResponse("Error: bad request"));

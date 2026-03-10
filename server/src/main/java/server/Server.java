@@ -16,7 +16,7 @@ public class Server {
 
     private final Javalin javalin;
 
-    public Server() {
+    public Server() throws DataAccessException {
         Gson gson = new GsonBuilder().serializeNulls().create();
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
@@ -24,9 +24,9 @@ public class Server {
         });
 
         // DAOs
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
+        SQLUserDAO userDAO = new SQLUserDAO();
+        AuthDAO authDAO = new MemoryAuthDAO();
+        GameDAO gameDAO = new MemoryGameDAO();
 
         // Service
         UserService userService = new UserService(userDAO, authDAO);
