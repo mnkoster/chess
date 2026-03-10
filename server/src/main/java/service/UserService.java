@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 import handler.AlreadyTakenException;
@@ -25,7 +26,7 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public LoginResult login(String username, String password) {
+    public LoginResult login(String username, String password) throws DataAccessException {
         UserData user = userDAO.getUser(username);
 
         if (user == null || !user.password().equals(password)) {
@@ -38,7 +39,7 @@ public class UserService {
         return new LoginResult(username, token);
     }
 
-    public RegisterResult register(String username, String password, String email) {
+    public RegisterResult register(String username, String password, String email) throws DataAccessException {
         if (username == null || password == null || email == null) {
             throw new BadRequestException("Error: bad request");
         }

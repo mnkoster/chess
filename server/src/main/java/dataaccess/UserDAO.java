@@ -6,7 +6,7 @@ import model.UserData;
  * 3/1/26: added getUser() for p3 apis
  */
 public interface UserDAO {
-    UserData getUser(String username);
-    void addUser(UserData user);
-    void clear();
+    UserData getUser(String username) throws DataAccessException;
+    void addUser(UserData user) throws DataAccessException;
+    void clear() throws DataAccessException;
 }
