@@ -9,6 +9,7 @@ import service.UserService;
 
 /**
  * 3/1/26: added for p3 apis (register)
+ * 3/11/26: finalized for p4 implementation
  */
 public class RegisterHandler {
 
