@@ -25,7 +25,7 @@ public class Server {
 
         try {
             // DAOs
-            SQLUserDAO userDAO = new SQLUserDAO();
+            UserDAO userDAO = new SQLUserDAO();
             AuthDAO authDAO = new MemoryAuthDAO();
             GameDAO gameDAO = new MemoryGameDAO();
 
@@ -66,6 +66,7 @@ public class Server {
             ctx.status(403).json(new ErrorResponse(e.getMessage()));
         }); // 403: username already taken
         javalin.exception(Exception.class, (e, ctx) -> {
+            e.printStackTrace();
             ctx.status(500).json(new ErrorResponse("Error: server error"));
         }); // 500: other errors
     }

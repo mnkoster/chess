@@ -15,7 +15,7 @@ public class ClearHandler {
     public void handle(Context ctx) {
         try {
             clearService.clear();
-            ctx.status(200).json(new Object());
+            ctx.status(200);
         } catch (DataAccessException e) {
             ctx.status(500).json(new ErrorResponse("Error: server error"));
         }
