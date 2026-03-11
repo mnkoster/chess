@@ -36,7 +36,7 @@ public class SQLUserDAO implements UserDAO {
     public UserData getUser(String username) throws DataAccessException {
         var getUser = """
                 SELECT username, password, email
-                FROM user
+                FROM users
                 WHERE username = ?
                 """;
 
