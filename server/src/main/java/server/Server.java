@@ -16,41 +16,45 @@ public class Server {
 
     private final Javalin javalin;
 
-    public Server() throws DataAccessException {
+    public Server() {
         Gson gson = new GsonBuilder().serializeNulls().create();
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
             config.jsonMapper(new JavalinGson(gson, false));
         });
 
-        // DAOs
-        SQLUserDAO userDAO = new SQLUserDAO();
-        AuthDAO authDAO = new MemoryAuthDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
+        try {
+            // DAOs
+            SQLUserDAO userDAO = new SQLUserDAO();
+            AuthDAO authDAO = new MemoryAuthDAO();
+            GameDAO gameDAO = new MemoryGameDAO();
 
-        // Service
-        UserService userService = new UserService(userDAO, authDAO);
-        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
-        GameService gameService = new GameService(gameDAO, authDAO);
+            // Service
+            UserService userService = new UserService(userDAO, authDAO);
+            ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+            GameService gameService = new GameService(gameDAO, authDAO);
 
-        // Handler
-        RegisterHandler registerHandler = new RegisterHandler(userService);
-        LoginHandler loginHandler = new LoginHandler(userService);
-        LogoutHandler logoutHandler = new LogoutHandler(userService);
-        ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
-        CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
-        JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
-        ClearHandler clearHandler = new ClearHandler(clearService);
+            // Handler
+            RegisterHandler registerHandler = new RegisterHandler(userService);
+            LoginHandler loginHandler = new LoginHandler(userService);
+            LogoutHandler logoutHandler = new LogoutHandler(userService);
+            ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
+            CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
+            JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
+            ClearHandler clearHandler = new ClearHandler(clearService);
 
-        // Route
-        javalin.post("/user", registerHandler::handle);
-        javalin.post("/session", loginHandler::handle);
-        javalin.delete("/session", logoutHandler::handle);
-        javalin.get("/game", listGamesHandler::handle);
-        javalin.post("/game", createGameHandler::handle);
-        javalin.put("/game", joinGameHandler::handle);
-        javalin.delete("/db", clearHandler::handle);
+            // Route
+            javalin.post("/user", registerHandler::handle);
+            javalin.post("/session", loginHandler::handle);
+            javalin.delete("/session", logoutHandler::handle);
+            javalin.get("/game", listGamesHandler::handle);
+            javalin.post("/game", createGameHandler::handle);
+            javalin.put("/game", joinGameHandler::handle);
+            javalin.delete("/db", clearHandler::handle);
 
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Database failed", e);
+        }
         // Exceptions
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).json(new ErrorResponse(e.getMessage()));
