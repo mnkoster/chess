@@ -1,5 +1,6 @@
 package handler;
 
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import requests.CreateGameRequest;
 import service.GameService;
@@ -18,9 +19,13 @@ public class CreateGameHandler {
     }
 
     public void handle(Context ctx) {
-        String authToken = ctx.header("Authorization");
-        CreateGameRequest request = ctx.bodyAsClass(CreateGameRequest.class);
-        int gameID = gameService.createGame(authToken, request.gameName());
-        ctx.status(200).json(Map.of("gameID", gameID));
+        try {
+            String authToken = ctx.header("Authorization");
+            CreateGameRequest request = ctx.bodyAsClass(CreateGameRequest.class);
+            int gameID = gameService.createGame(authToken, request.gameName());
+            ctx.status(200).json(Map.of("gameID", gameID));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(new ErrorResponse("Error: server error"));
+        }
     }
 }

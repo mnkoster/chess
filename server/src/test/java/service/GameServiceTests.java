@@ -35,7 +35,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void createGamePositive() {
+    public void createGamePositive() throws DataAccessException {
         int gameID = gameService.createGame(playerValidToken1, "MyGame");
         assertEquals(1000, gameID);
     }
@@ -46,7 +46,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void getListGamesPositive() {
+    public void getListGamesPositive() throws DataAccessException {
         gameService.createGame(playerValidToken1, "game1");
         gameService.createGame(playerValidToken1, "game2");
         gameService.createGame(playerValidToken1, "game3");
@@ -62,7 +62,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void joinGamePositive() {
+    public void joinGamePositive() throws DataAccessException {
         int gameID = gameService.createGame(playerValidToken1, "theGame");
         gameService.joinGame(playerValidToken1, gameID, "WHITE");
         GameData testGame = gameDAO.getGame(gameID);

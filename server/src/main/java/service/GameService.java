@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import chess.ChessGame;
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UnauthorizedException;
 import handler.AlreadyTakenException;
@@ -24,7 +25,7 @@ public class GameService {
         this.authDAO = authDAO;
     }
 
-    public Collection<GameData> getListGames(String authToken) {
+    public Collection<GameData> getListGames(String authToken) throws DataAccessException {
         if (authToken == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
@@ -36,7 +37,7 @@ public class GameService {
         return gameDAO.getListGames();
     }
 
-    public int createGame(String authToken, String gameName) {
+    public int createGame(String authToken, String gameName) throws DataAccessException {
         if (authToken == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
@@ -52,7 +53,7 @@ public class GameService {
         return gameDAO.createGame(gameName);
     }
 
-    public void joinGame(String authToken, int gameID, String playerColor) {
+    public void joinGame(String authToken, int gameID, String playerColor) throws DataAccessException {
         if (authToken == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }

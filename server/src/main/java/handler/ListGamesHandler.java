@@ -1,5 +1,6 @@
 package handler;
 
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import java.util.Map;
 import service.GameService;
@@ -16,8 +17,12 @@ public class ListGamesHandler {
     }
 
     public void handle(Context ctx) {
-        String authToken = ctx.header("Authorization");
-        var games = gameService.getListGames(authToken);
-        ctx.status(200).json(Map.of("games", games));
+        try {
+            String authToken = ctx.header("Authorization");
+            var games = gameService.getListGames(authToken);
+            ctx.status(200).json(Map.of("games", games));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(new ErrorResponse("Error: server error"));
+        }
     }
 }
