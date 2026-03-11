@@ -19,7 +19,7 @@ public class GameServiceTests {
     private String playerValidToken1;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws DataAccessException {
         UserDAO userDAO = new MemoryUserDAO();
         gameDAO = new MemoryGameDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
@@ -70,7 +70,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void joinGameNegative() {
+    public void joinGameNegative() throws DataAccessException {
         String username = "player2";
         String password = "player2password";
         String email = "player2@email.em";

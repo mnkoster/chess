@@ -29,7 +29,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void registerPositive() {
+    public void registerPositive() throws DataAccessException {
         RegisterResult result = userService.register(username, password, email);
         playerValidToken1 = result.authToken();
 
@@ -37,7 +37,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void registerNegative() {
+    public void registerNegative() throws DataAccessException {
         String password2 = "password2";
         userService.register(username, password, email);
         assertThrows(AlreadyTakenException.class, () ->
@@ -45,7 +45,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void loginPositive() {
+    public void loginPositive() throws DataAccessException {
         RegisterResult result = userService.register(username, password, email);
         playerValidToken1 = result.authToken();
 
@@ -55,7 +55,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void loginNegative() {
+    public void loginNegative() throws DataAccessException {
         RegisterResult result = userService.register(username, password, email);
         playerValidToken1 = result.authToken();
 
@@ -64,7 +64,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void logoutPositive() {
+    public void logoutPositive() throws DataAccessException {
         RegisterResult result = userService.register(username, password, email);
         playerValidToken1 = result.authToken();
         LoginResult login = userService.login(username, password);
@@ -74,7 +74,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void logoutNegative() {
+    public void logoutNegative() throws DataAccessException {
         RegisterResult result = userService.register(username, password, email);
         playerValidToken1 = result.authToken();
         LoginResult login = userService.login(username, password);

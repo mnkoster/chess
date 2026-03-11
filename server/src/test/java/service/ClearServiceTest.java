@@ -16,7 +16,7 @@ public class ClearServiceTest {
     private static String playerValidToken1;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws DataAccessException {
         UserDAO userDAO = new MemoryUserDAO();
         gameDAO = new MemoryGameDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
@@ -39,7 +39,7 @@ public class ClearServiceTest {
     }
 
     @Test
-    public void clearPositive() {
+    public void clearPositive() throws DataAccessException {
         clearService.clear();
 
         assertTrue(gameDAO.getListGames().isEmpty(), "Games should be empty");

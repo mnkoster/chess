@@ -1,5 +1,6 @@
 package handler;
 
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import service.UserService;
 
@@ -15,8 +16,12 @@ public class LogoutHandler {
     }
 
     public void handle(Context ctx) {
-        String authToken = ctx.header("Authorization");
-        userService.logout(authToken);
-        ctx.status(200).json(new Object());
+        try {
+            String authToken = ctx.header("Authorization");
+            userService.logout(authToken);
+            ctx.status(200).json(new Object());
+        } catch (DataAccessException e) {
+            ctx.status(500).json(new ErrorResponse("Error: server error"));
+        }
     }
 }
