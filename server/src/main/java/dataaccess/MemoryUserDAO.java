@@ -16,12 +16,12 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public void addUser(UserData user) {
+    public void addUser(UserData user) throws DataAccessException {
         users.put(user.username(), user);
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
         users.clear();
     }
 }

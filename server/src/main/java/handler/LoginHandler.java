@@ -17,7 +17,7 @@ public class LoginHandler {
         this.userService = userService;
     }
 
-    public void handle(Context ctx) throws DataAccessException {
+    public void handle(Context ctx) {
         LoginRequest request = ctx.bodyAsClass(LoginRequest.class);
         if (request.username() == null || request.password() == null) {
             ctx.status(400).json(new ErrorResponse("Error: bad request"));

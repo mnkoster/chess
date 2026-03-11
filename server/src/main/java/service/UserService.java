@@ -15,6 +15,7 @@ import java.util.UUID;
 
 /**
  * 3/1/26: added for p3 apis (AuthService, login, logout)
+ * 3/10/26: updated for p4 database (DataAccessExceptions)
  */
 public class UserService {
 
@@ -27,7 +28,8 @@ public class UserService {
     }
 
     public LoginResult login(String username, String password) throws DataAccessException {
-        UserData user = userDAO.getUser(username);
+        UserData user;
+        user = userDAO.getUser(username);
 
         if (user == null || !user.password().equals(password)) {
             throw new UnauthorizedException("Error: unauthorized");
@@ -44,7 +46,9 @@ public class UserService {
             throw new BadRequestException("Error: bad request");
         }
 
-        if (userDAO.getUser(username) != null) {
+        UserData possibleUserName;
+        possibleUserName = userDAO.getUser(username);
+        if (possibleUserName != null) {
             throw new AlreadyTakenException("Error: username already taken");
         }
 
@@ -57,7 +61,7 @@ public class UserService {
         return new RegisterResult(username, token);
     }
 
-    public void logout(String authToken) {
+    public void logout(String authToken) throws DataAccessException {
         if (authToken == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
