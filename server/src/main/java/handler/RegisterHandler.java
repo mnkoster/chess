@@ -1,5 +1,7 @@
 package handler;
 
+import dataaccess.DataAccessException;
+import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
 import requests.RegisterRequest;
 import results.RegisterResult;
@@ -17,12 +19,18 @@ public class RegisterHandler {
     }
 
     public void handle(Context ctx) {
-        RegisterRequest request = ctx.bodyAsClass(RegisterRequest.class);
-        RegisterResult result = userService.register(
-                request.username(),
-                request.password(),
-                request.email()
-        );
-        ctx.status(200).json(result);
+        try {
+            RegisterRequest request = ctx.bodyAsClass(RegisterRequest.class);
+            RegisterResult result = userService.register(
+                    request.username(),
+                    request.password(),
+                    request.email()
+            );
+            ctx.status(200).json(result);
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(new ErrorResponse(e.getMessage()));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(new ErrorResponse("Error: server error"));
+        }
     }
 }
