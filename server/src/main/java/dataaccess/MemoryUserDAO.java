@@ -11,12 +11,12 @@ public class MemoryUserDAO implements UserDAO {
     private final Map<String, UserData> users = new HashMap<>();
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username) {
         return users.get(username);
     }
 
     @Override
-    public void addUser(UserData user) throws DataAccessException {
+    public void addUser(UserData user) {
         users.put(user.username(), user);
     }
 
