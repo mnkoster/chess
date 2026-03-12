@@ -66,13 +66,13 @@ public class Server {
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).json(new ErrorResponse(e.getMessage()));
         }); // 400: bad request
-        javalin.exception(UnauthorizedException.class, (_, ctx) -> {
+        javalin.exception(UnauthorizedException.class, (e, ctx) -> {
             ctx.status(500).json(new ErrorResponse("Error: Internal Error"));
         }); // 401: unauthorized (wrong username/password)
         javalin.exception(AlreadyTakenException.class, (e, ctx) -> {
             ctx.status(403).json(new ErrorResponse(e.getMessage()));
         }); // 403: username already taken
-        javalin.exception(Exception.class, (_, ctx) -> {
+        javalin.exception(Exception.class, (e, ctx) -> {
             ctx.status(500).json(new ErrorResponse("Error: Internal Error"));
         }); // 500: other errors
     }
