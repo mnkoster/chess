@@ -33,7 +33,7 @@ public class SQLAuthDAO implements AuthDAO {
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
         var addAuth = """
-                INSERT INTO authTokens (authToken, username) 
+                INSERT INTO authTokens (authToken, username)
                 VALUES (?, ?)
                 """;
         try (var conn = DatabaseManager.getConnection();
@@ -50,7 +50,7 @@ public class SQLAuthDAO implements AuthDAO {
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         var getAuth = """
-                SELECT authToken
+                SELECT authToken, username
                 FROM authTokens
                 WHERE authToken = ?
                 """;
@@ -61,7 +61,7 @@ public class SQLAuthDAO implements AuthDAO {
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 if (rs.next()) {
                     String authToken1 = rs.getString("authToken");
-                    String username = rs.getString("password");
+                    String username = rs.getString("username");
                     return new AuthData(authToken1, username);
                 }
             }
@@ -74,7 +74,7 @@ public class SQLAuthDAO implements AuthDAO {
     // Interface function - added 3/11/26
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        var clearAuth = "DELETE ? FROM authTokens";
+        var clearAuth = "DELETE FROM authTokens WHERE authToken = ?";
         try (var conn = DatabaseManager.getConnection();
              var preparedStatement = conn.prepareStatement(clearAuth)) {
             preparedStatement.setString(1, authToken);

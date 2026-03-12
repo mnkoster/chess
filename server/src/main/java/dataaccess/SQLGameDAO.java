@@ -27,7 +27,7 @@ public class SQLGameDAO implements GameDAO {
         DatabaseManager.createDatabase();
         var createGamesTable = """
                 CREATE TABLE IF NOT EXISTS games(
-                    gameID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                    gameID INT NOT NULL AUTO_INCREMENT,
                     whiteUsername VARCHAR(255) NULL,
                     blackUsername VARCHAR(255) NULL,
                     gameName VARCHAR (255) NOT NULL,
@@ -65,6 +65,7 @@ public class SQLGameDAO implements GameDAO {
         } catch (Exception ex) {
             throw new DataAccessException("unable to get list of games", ex);
         }
+
         return gamesList;
     }
 
