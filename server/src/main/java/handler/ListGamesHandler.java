@@ -1,6 +1,7 @@
 package handler;
 
 import dataaccess.DataAccessException;
+import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
 import java.util.Map;
 import service.GameService;
@@ -21,6 +22,8 @@ public class ListGamesHandler {
             String authToken = ctx.header("Authorization");
             var games = gameService.getListGames(authToken);
             ctx.status(200).json(Map.of("games", games));
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(new ErrorResponse("Error: unauthorized"));
         } catch (DataAccessException e) {
             ctx.status(500).json(new ErrorResponse("Error: server error"));
         }
