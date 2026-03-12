@@ -60,7 +60,6 @@ public class Server {
             javalin.post("/game", createGameHandler::handle);
             javalin.put("/game", joinGameHandler::handle);
             javalin.delete("/db", clearHandler::handle);
-
 //       } catch (DataAccessException e) {
 //            throw new RuntimeException("Database failed", e);
 //        }
