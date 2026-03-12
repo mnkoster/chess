@@ -32,12 +32,12 @@ public class SQLAuthDAOTests {
 
     @Test
     public void getAuthPositive() throws DataAccessException {
-        AuthData auth = new AuthData("token1", "user1");
+        AuthData auth = new AuthData("token2", "user2");
         authDAO.createAuth(auth);
-        AuthData result = authDAO.getAuth("token1");
+        AuthData result = authDAO.getAuth("token2");
         assertNotNull(result);
-        assertEquals("token1", result.authToken());
-        assertEquals("user1", result.username());
+        assertEquals("token2", result.authToken());
+        assertEquals("user2", result.username());
     }
 
     @Test
