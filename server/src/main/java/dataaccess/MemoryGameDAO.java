@@ -14,7 +14,7 @@ import java.util.Map;
 public class MemoryGameDAO implements GameDAO {
 
     private final Map<Integer, GameData> games = new HashMap<>();
-    private int nextGameID = 1000;
+    private int nextGameID = 1;
 
     @Override
     public Collection<GameData> getListGames() {
