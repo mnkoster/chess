@@ -60,7 +60,7 @@ public class SQLGameDAO implements GameDAO {
                 String gameJson = rs.getString("game");
                 ChessGame game = gson.fromJson(gameJson, ChessGame.class);
 
-                gamesList.add(new GameData(gameID, gameName, whitePlayer, blackPlayer, game));
+                gamesList.add(new GameData(gameID, whitePlayer, blackPlayer, gameName, game));
             }
         } catch (Exception ex) {
             throw new DataAccessException("unable to get list of games", ex);
@@ -111,13 +111,13 @@ public class SQLGameDAO implements GameDAO {
             statement.setInt(1, gameID);
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
-                    String gameName = rs.getString("gameName");
+                    String gameNameDB = rs.getString("gameName");
                     String white = rs.getString("whiteUsername");
                     String black = rs.getString("blackUsername");
                     String gameJson = rs.getString("game");
                     ChessGame game = gson.fromJson(gameJson, ChessGame.class);
 
-                    return new GameData(gameID, white, black, gameName, game);
+                    return new GameData(gameID, white, black, gameNameDB, game);
                 }
             }
         } catch (Exception ex) {
