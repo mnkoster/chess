@@ -8,7 +8,8 @@ import service.GameService;
 import java.util.Map;
 
 /**
- * 3/2/26: added for p3 apis (games)
+ * 3/2/26: added for p3 apis - games
+ * 3/10/26: updated for p4 database with DataAccessException
  */
 public class CreateGameHandler {
 

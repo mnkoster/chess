@@ -8,6 +8,9 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * 3/11/26: added for p4 database - unit tests
+ */
 public class SQLGameDAOTests {
 
     SQLGameDAO gameDAO;
@@ -21,6 +24,7 @@ public class SQLGameDAOTests {
     @Test
     public void createGamePositive() throws DataAccessException {
         int gameID = gameDAO.createGame("TestGame");
+
         GameData result = gameDAO.getGame(gameID);
         assertNotNull(result);
         assertEquals("TestGame", result.gameName());
@@ -37,6 +41,7 @@ public class SQLGameDAOTests {
     @Test
     public void getGamePositive() throws DataAccessException {
         int gameID = gameDAO.createGame("MyChessGame");
+
         GameData result = gameDAO.getGame(gameID);
         assertNotNull(result);
         assertEquals(gameID, result.gameID());
@@ -53,6 +58,7 @@ public class SQLGameDAOTests {
     public void getListGamesPositive() throws DataAccessException {
         gameDAO.createGame("Game1");
         gameDAO.createGame("Game2");
+
         Collection<GameData> games = gameDAO.getListGames();
         assertEquals(2, games.size());
     }
@@ -75,6 +81,7 @@ public class SQLGameDAOTests {
                 new ChessGame()
         );
         gameDAO.updateGame(updated);
+
         GameData result = gameDAO.getGame(gameID);
         assertEquals("UpdatedGame", result.gameName());
         assertEquals("whitePlayer", result.whiteUsername());
@@ -98,6 +105,7 @@ public class SQLGameDAOTests {
     @Test
     public void clearPositive() throws DataAccessException {
         gameDAO.createGame("GameToDelete");
+
         gameDAO.clear();
         assertTrue(gameDAO.getListGames().isEmpty());
     }

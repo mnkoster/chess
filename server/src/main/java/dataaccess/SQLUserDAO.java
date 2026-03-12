@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 
 /**
  * 3/10/26: added for p4 database set up
- * 3/11/26: updated and finalized for p4 user and Bcrypt test
+ * 3/11/26: updated, finalized for p4 database - user and Bcrypt test
  */
 public class SQLUserDAO implements UserDAO {
 

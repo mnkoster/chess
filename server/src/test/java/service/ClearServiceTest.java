@@ -7,6 +7,9 @@ import results.LoginResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * 3/2/26: added for p3 apis - unit tests
+ */
 public class ClearServiceTest {
 
     private GameDAO gameDAO;
@@ -20,6 +23,7 @@ public class ClearServiceTest {
         UserDAO userDAO = new MemoryUserDAO();
         gameDAO = new MemoryGameDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
+
         gameService = new GameService(gameDAO, authDAO);
         userService = new UserService(userDAO, authDAO);
         clearService = new ClearService(userDAO, authDAO, gameDAO);

@@ -10,6 +10,10 @@ import handler.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * 3/2/26: added for p3 apis
+ * 3/11/26: updated for p4 database
+ */
 public class Server {
 
     private final Javalin javalin;
@@ -69,15 +73,12 @@ public class Server {
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).json(new ErrorResponse(e.getMessage()));
         });
-
         javalin.exception(UnauthorizedException.class, (e, ctx) -> {
             ctx.status(401).json(new ErrorResponse(e.getMessage()));
         });
-
         javalin.exception(AlreadyTakenException.class, (e, ctx) -> {
             ctx.status(403).json(new ErrorResponse(e.getMessage()));
         });
-
         javalin.exception(Exception.class, (e, ctx) -> {
             ctx.status(500).json(new ErrorResponse("Error: server error"));
         });

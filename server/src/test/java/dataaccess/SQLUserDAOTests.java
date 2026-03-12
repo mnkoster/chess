@@ -4,6 +4,9 @@ import model.UserData;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * 3/11/26: added for p4 database - unit tests
+ */
 public class SQLUserDAOTests {
 
     SQLUserDAO userDAO;

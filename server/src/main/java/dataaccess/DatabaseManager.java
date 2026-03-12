@@ -3,6 +3,9 @@ package dataaccess;
 import java.sql.*;
 import java.util.Properties;
 
+/**
+ * 3/10/26: added from startcode for p4 database
+ */
 public class DatabaseManager {
     private static String databaseName;
     private static String dbUsername;

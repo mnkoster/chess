@@ -15,9 +15,9 @@ import results.RegisterResult;
 import java.util.UUID;
 
 /**
- * 3/1/26: added for p3 apis (AuthService, login, logout)
- * 3/10/26: updated for p4 database (DataAccessExceptions)
- * 3/11/26: updated for Bcrypt for password storage
+ * 3/1/26: added for p3 apis - AuthService, login, logout
+ * 3/10/26: updated for p4 database - DataAccessExceptions
+ * 3/11/26: updated for p4 database - Bcrypt for password storage
  */
 public class UserService {
 

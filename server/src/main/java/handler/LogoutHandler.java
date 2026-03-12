@@ -5,7 +5,8 @@ import io.javalin.http.Context;
 import service.UserService;
 
 /**
- * 3/1/26: added for p3 apis (logout)
+ * 3/1/26: added for p3 apis - logout
+ * 3/10/26: updated for p4 database with DataAccessException
  */
 public class LogoutHandler {
 

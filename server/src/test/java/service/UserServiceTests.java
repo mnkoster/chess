@@ -9,6 +9,9 @@ import results.RegisterResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * 3/2/26: added for p3 apis - unit tests
+ */
 public class UserServiceTests {
 
     private AuthDAO authDAO;
@@ -31,14 +34,15 @@ public class UserServiceTests {
     @Test
     public void registerPositive() throws DataAccessException {
         RegisterResult result = userService.register(username, password, email);
-        playerValidToken1 = result.authToken();
 
+        playerValidToken1 = result.authToken();
         assertEquals(username, authDAO.getAuth(playerValidToken1).username());
     }
 
     @Test
     public void registerNegative() throws DataAccessException {
         String password2 = "password2";
+
         userService.register(username, password, email);
         assertThrows(AlreadyTakenException.class, () ->
                 userService.register(username, password2, email));
@@ -48,8 +52,8 @@ public class UserServiceTests {
     public void loginPositive() throws DataAccessException {
         RegisterResult result = userService.register(username, password, email);
         playerValidToken1 = result.authToken();
-
         LoginResult login = userService.login(username, password);
+
         playerValidToken1 = login.authToken();
         assertEquals(playerValidToken1, authDAO.getAuth(playerValidToken1).authToken());
     }
@@ -57,8 +61,8 @@ public class UserServiceTests {
     @Test
     public void loginNegative() throws DataAccessException {
         RegisterResult result = userService.register(username, password, email);
-        playerValidToken1 = result.authToken();
 
+        playerValidToken1 = result.authToken();
         assertThrows(UnauthorizedException.class, () ->
                 userService.login(username, "wrongPassword"));
     }
@@ -69,6 +73,7 @@ public class UserServiceTests {
         playerValidToken1 = result.authToken();
         LoginResult login = userService.login(username, password);
         playerValidToken1 = login.authToken();
+
         userService.logout(playerValidToken1);
         assertNull(authDAO.getAuth(playerValidToken1));
     }
@@ -78,8 +83,8 @@ public class UserServiceTests {
         RegisterResult result = userService.register(username, password, email);
         playerValidToken1 = result.authToken();
         LoginResult login = userService.login(username, password);
-        playerValidToken1 = login.authToken();
 
+        playerValidToken1 = login.authToken();
         assertThrows(UnauthorizedException.class, () ->
                 userService.logout("notAValidToken"));
     }

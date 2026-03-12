@@ -6,8 +6,8 @@ import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 
 /**
- * 3/1/26: added for p3 apis (clear)
- * 3/10/26: updated for p4 database (DataAccessExceptions)
+ * 3/1/26: added for p3 apis - clear
+ * 3/10/26: updated for p4 database - DataAccessExceptions
  */
 public class ClearService {
 

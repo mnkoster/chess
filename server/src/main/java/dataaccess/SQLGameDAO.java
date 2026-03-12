@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * 3/11/26: added for p4 implementation (database)
+ * 3/11/26: added for p4 database
  */
 public class SQLGameDAO implements GameDAO {
 

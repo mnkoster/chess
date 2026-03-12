@@ -7,10 +7,9 @@ import requests.LoginRequest;
 import results.LoginResult;
 import service.UserService;
 
-import java.util.Map;
-
 /**
- * 3/1/26: added handler for p3 apis (login)
+ * 3/1/26: added p3 apis - login
+ * 3/10/26: updated for p4 database with DataAccessException
  */
 public class LoginHandler {
 

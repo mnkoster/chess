@@ -6,7 +6,8 @@ import requests.JoinGameRequest;
 import service.GameService;
 
 /**
- * 3/2/26: added for p3 apis (join games)
+ * 3/2/26: added for p3 apis - join games
+ * 3/10/26: updated for p4 database with DataAccessException
  */
 public class JoinGameHandler {
 

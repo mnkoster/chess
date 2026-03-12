@@ -2,10 +2,8 @@ package dataaccess;
 
 import model.UserData;
 
-import javax.xml.crypto.Data;
-
 /**
- * 3/1/26: added getUser() for p3 apis
+ * 3/1/26: added for p3 apis - getUser()
  */
 public interface UserDAO {
     UserData getUser(String username) throws DataAccessException;

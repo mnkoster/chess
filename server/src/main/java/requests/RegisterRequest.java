@@ -1,7 +1,7 @@
 package requests;
 
 /**
- * 3/1/26: added for p3 apis (register)
+ * 3/1/26: added for p3 apis - register
  * @param username
  * @param password
  * @param email

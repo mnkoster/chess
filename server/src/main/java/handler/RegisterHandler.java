@@ -8,8 +8,8 @@ import results.RegisterResult;
 import service.UserService;
 
 /**
- * 3/1/26: added for p3 apis (register)
- * 3/11/26: finalized for p4 implementation
+ * 3/1/26: added for p3 apis - register
+ * 3/10/26: updated for p4 database with DataAccessException
  */
 public class RegisterHandler {
 

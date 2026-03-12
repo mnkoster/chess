@@ -6,7 +6,8 @@ import java.util.Collection;
 
 /**
  * 3/1/26: added clear for /db
- * 3/2/26: added game functions for listGames, createGame
+ * 3/2/26: added game functions for p3 apis
+ * 3/11/26: added for p4 database
  */
 public interface GameDAO {
     Collection<GameData> getListGames() throws DataAccessException;

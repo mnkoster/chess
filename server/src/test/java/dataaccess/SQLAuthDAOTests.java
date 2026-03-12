@@ -5,6 +5,9 @@ import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * 3/11/26: added for p4 database - unit tests
+ */
 public class SQLAuthDAOTests {
 
     SQLAuthDAO authDAO;
@@ -19,6 +22,7 @@ public class SQLAuthDAOTests {
     public void createAuthPositive() throws DataAccessException {
         AuthData auth = new AuthData("token1", "user1");
         authDAO.createAuth(auth);
+
         AuthData result = authDAO.getAuth("token1");
         assertNotNull(result);
         assertEquals("token1", result.authToken());
@@ -34,6 +38,7 @@ public class SQLAuthDAOTests {
     public void getAuthPositive() throws DataAccessException {
         AuthData auth = new AuthData("token2", "user2");
         authDAO.createAuth(auth);
+
         AuthData result = authDAO.getAuth("token2");
         assertNotNull(result);
         assertEquals("token2", result.authToken());
@@ -51,6 +56,7 @@ public class SQLAuthDAOTests {
         AuthData auth = new AuthData("tokenDel", "userDel");
         authDAO.createAuth(auth);
         authDAO.deleteAuth("tokenDel");
+
         AuthData result = authDAO.getAuth("tokenDel");
         assertNull(result);
     }
@@ -66,6 +72,7 @@ public class SQLAuthDAOTests {
     public void clearPositive() throws DataAccessException {
         authDAO.createAuth(new AuthData("t1", "u1"));
         authDAO.createAuth(new AuthData("t2", "u2"));
+
         authDAO.clear();
         assertNull(authDAO.getAuth("t1"));
         assertNull(authDAO.getAuth("t2"));

@@ -11,6 +11,9 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * 3/2/26: added for p3 apis - unit tests
+ */
 public class GameServiceTests {
 
     private GameDAO gameDAO;
@@ -23,6 +26,7 @@ public class GameServiceTests {
         UserDAO userDAO = new MemoryUserDAO();
         gameDAO = new MemoryGameDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
+
         gameService = new GameService(gameDAO, authDAO);
         userService = new UserService(userDAO, authDAO);
 
@@ -65,6 +69,7 @@ public class GameServiceTests {
     public void joinGamePositive() throws DataAccessException {
         int gameID = gameService.createGame(playerValidToken1, "theGame");
         gameService.joinGame(playerValidToken1, gameID, "WHITE");
+
         GameData testGame = gameDAO.getGame(gameID);
         assertEquals("player1", testGame.whiteUsername());
     }
@@ -74,11 +79,12 @@ public class GameServiceTests {
         String username = "player2";
         String password = "player2password";
         String email = "player2@email.em";
+
         userService.register(username, password, email);
         LoginResult login = userService.login(username, password);
         String playerValidToken2 = login.authToken();
-        
         int gameID = gameService.createGame(playerValidToken1, "theWrongGame");
+
         gameService.joinGame(playerValidToken2, gameID, "WHITE");
         assertThrows(AlreadyTakenException.class, () ->
                 gameService.joinGame(playerValidToken1, gameID, "WHITE"));
