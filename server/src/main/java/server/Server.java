@@ -78,7 +78,7 @@ public class Server {
             ctx.status(403).json(new ErrorResponse(e.getMessage()));
         });
 
-        javalin.exception(Exception.class, (_, ctx) -> {
+        javalin.exception(Exception.class, (e, ctx) -> {
             ctx.status(500).json(new ErrorResponse("Error: server error"));
         });
     }
