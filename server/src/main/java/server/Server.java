@@ -23,59 +23,50 @@ public class Server {
             config.jsonMapper(new JavalinGson(gson, false));
         });
 
-//        try {
-            // DAOs
-            UserDAO userDAO;
-            AuthDAO authDAO;
-            GameDAO gameDAO;
-            try {
-                userDAO = new SQLUserDAO();
-                authDAO = new SQLAuthDAO();
-                gameDAO = new SQLGameDAO();
-            } catch (DataAccessException e) {
-                userDAO = new MemoryUserDAO();
-                authDAO = new MemoryAuthDAO();
-                gameDAO = new MemoryGameDAO();
-            }
+        // DAOs
+        UserDAO userDAO;
+        AuthDAO authDAO;
+        GameDAO gameDAO;
+        try {
+            userDAO = new SQLUserDAO();
+            authDAO = new SQLAuthDAO();
+            gameDAO = new SQLGameDAO();
+        } catch (DataAccessException e) {
+            userDAO = new MemoryUserDAO();
+            authDAO = new MemoryAuthDAO();
+            gameDAO = new MemoryGameDAO();
+        }
 
-            // Service
-            UserService userService = new UserService(userDAO, authDAO);
-            ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
-            GameService gameService = new GameService(gameDAO, authDAO);
+        // Service
+        UserService userService = new UserService(userDAO, authDAO);
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        GameService gameService = new GameService(gameDAO, authDAO);
 
-            // Handler
-            RegisterHandler registerHandler = new RegisterHandler(userService);
-            LoginHandler loginHandler = new LoginHandler(userService);
-            LogoutHandler logoutHandler = new LogoutHandler(userService);
-            ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
-            CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
-            JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
-            ClearHandler clearHandler = new ClearHandler(clearService);
+        // Handler
+        RegisterHandler registerHandler = new RegisterHandler(userService);
+        LoginHandler loginHandler = new LoginHandler(userService);
+        LogoutHandler logoutHandler = new LogoutHandler(userService);
+        ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
+        CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
+        JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
+        ClearHandler clearHandler = new ClearHandler(clearService);
 
-            // Route
-            javalin.post("/user", registerHandler::handle);
-            javalin.post("/session", loginHandler::handle);
-            javalin.delete("/session", logoutHandler::handle);
-            javalin.get("/game", listGamesHandler::handle);
-            javalin.post("/game", createGameHandler::handle);
-            javalin.put("/game", joinGameHandler::handle);
-            javalin.delete("/db", clearHandler::handle);
+        // Route
+        javalin.post("/user", registerHandler::handle);
+        javalin.post("/session", loginHandler::handle);
+        javalin.delete("/session", logoutHandler::handle);
+        javalin.get("/game", listGamesHandler::handle);
+        javalin.post("/game", createGameHandler::handle);
+        javalin.put("/game", joinGameHandler::handle);
+        javalin.delete("/db", clearHandler::handle);
 //       } catch (DataAccessException e) {
 //            throw new RuntimeException("Database failed", e);
 //        }
         // Exceptions
-        javalin.exception(BadRequestException.class, (e, ctx) -> {
-            ctx.status(400).json(new ErrorResponse(e.getMessage()));
-        }); // 400: bad request
-        javalin.exception(UnauthorizedException.class, (e, ctx) -> {
-            ctx.status(401).json(new ErrorResponse(e.getMessage()));
-        }); // 401: unauthorized (wrong username/password)
-        javalin.exception(AlreadyTakenException.class, (e, ctx) -> {
-            ctx.status(403).json(new ErrorResponse(e.getMessage()));
-        }); // 403: username already taken
-        javalin.exception(Exception.class, (e, ctx) -> {
-            ctx.status(500).json(new ErrorResponse("Error: server error"));
-        }); // 500: other errors
+        javalin.exception(BadRequestException.class, (e, ctx) -> ctx.status(400).json(new ErrorResponse(e.getMessage()))); // 400: bad request
+        javalin.exception(UnauthorizedException.class, (_, ctx) -> ctx.status(500).json(new ErrorResponse("Error: Internal Error"))); // 401: unauthorized (wrong username/password)
+        javalin.exception(AlreadyTakenException.class, (e, ctx) -> ctx.status(403).json(new ErrorResponse(e.getMessage()))); // 403: username already taken
+        javalin.exception(Exception.class, (_, ctx) -> ctx.status(500).json(new ErrorResponse("Error: Internal Error"))); // 500: other errors
     }
 
     public int run(int desiredPort) {
