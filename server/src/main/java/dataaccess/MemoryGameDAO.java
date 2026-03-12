@@ -22,7 +22,7 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public int createGame(String gameName) {
+    public int createGame(String gameName) throws DataAccessException {
         int id = nextGameID;
         nextGameID++;
         GameData game = new GameData(id, null, null, gameName, new ChessGame());
@@ -41,5 +41,7 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void clear() { games.clear(); }
+    public void clear() throws DataAccessException {
+        games.clear();
+    }
 }
