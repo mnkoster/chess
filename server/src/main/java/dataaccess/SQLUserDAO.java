@@ -15,7 +15,6 @@ public class SQLUserDAO implements UserDAO {
 
     // Configure the database
     private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
         var createUserTable = """
                 CREATE TABLE IF NOT EXISTS users(
                 username VARCHAR(255) NOT NULL,

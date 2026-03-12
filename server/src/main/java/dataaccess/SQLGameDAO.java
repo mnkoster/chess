@@ -24,10 +24,9 @@ public class SQLGameDAO implements GameDAO {
 
     // Configure the database
     private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
         var createGamesTable = """
                 CREATE TABLE IF NOT EXISTS games(
-                    gameID INT NOT NULL AUTO_INCREMENT,
+                    gameID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
                     whiteUsername VARCHAR(255) NULL,
                     blackUsername VARCHAR(255) NULL,
                     gameName VARCHAR (255) NOT NULL,
