@@ -74,9 +74,9 @@ public class SQLAuthDAO implements AuthDAO {
     // Interface function - added 3/11/26
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        var clearUser = "DELETE ? FROM authTokens";
+        var clearAuth = "DELETE ? FROM authTokens";
         try (var conn = DatabaseManager.getConnection();
-             var preparedStatement = conn.prepareStatement(clearUser)) {
+             var preparedStatement = conn.prepareStatement(clearAuth)) {
             preparedStatement.setString(1, authToken);
             preparedStatement.executeUpdate();
         } catch (Exception ex) {
@@ -87,9 +87,9 @@ public class SQLAuthDAO implements AuthDAO {
     // Interface function - added 3/11/26
     @Override
     public void clear() throws DataAccessException {
-        var clearUser = "DELETE FROM authTokens";
+        var clearAuths = "DELETE FROM authTokens";
         try (var conn = DatabaseManager.getConnection();
-             var preparedStatement = conn.prepareStatement(clearUser)) {
+             var preparedStatement = conn.prepareStatement(clearAuths)) {
             preparedStatement.executeUpdate();
         } catch (Exception ex) {
             throw new DataAccessException("unable to clear authTokens", ex);

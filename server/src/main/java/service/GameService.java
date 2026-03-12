@@ -14,6 +14,7 @@ import model.GameData;
 
 /**
  * 3/2/26: added for p3 apis (games)
+ * 3/10/26: updated for p4 database (DataAccessExceptions)
  */
 public class GameService {
 
