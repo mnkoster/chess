@@ -140,7 +140,10 @@ public class SQLGameDAO implements GameDAO {
             statement.setString(3, game.gameName());
             statement.setString(4, gson.toJson(game.game()));
             statement.setInt(5, game.gameID());
-            statement.executeUpdate();
+            int affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new DataAccessException("Game with ID " + game.gameID() + " does not exist");
+            }
         } catch (Exception ex) {
             throw new DataAccessException("unable to update game", ex);
         }
