@@ -23,11 +23,20 @@ public class Server {
             config.jsonMapper(new JavalinGson(gson, false));
         });
 
-        try {
+//        try {
             // DAOs
-            UserDAO userDAO = new SQLUserDAO();
-            AuthDAO authDAO = new SQLAuthDAO();
-            GameDAO gameDAO = new SQLGameDAO();
+            UserDAO userDAO;
+            AuthDAO authDAO;
+            GameDAO gameDAO;
+            try {
+                userDAO = new SQLUserDAO();
+                authDAO = new SQLAuthDAO();
+                gameDAO = new SQLGameDAO();
+            } catch (DataAccessException e) {
+                userDAO = new MemoryUserDAO();
+                authDAO = new MemoryAuthDAO();
+                gameDAO = new MemoryGameDAO();
+            }
 
             // Service
             UserService userService = new UserService(userDAO, authDAO);
@@ -52,9 +61,9 @@ public class Server {
             javalin.put("/game", joinGameHandler::handle);
             javalin.delete("/db", clearHandler::handle);
 
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Database failed", e);
-        }
+//       } catch (DataAccessException e) {
+//            throw new RuntimeException("Database failed", e);
+//        }
         // Exceptions
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).json(new ErrorResponse(e.getMessage()));
