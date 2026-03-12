@@ -31,11 +31,11 @@ public class Server {
             userDAO = new SQLUserDAO();
             authDAO = new SQLAuthDAO();
             gameDAO = new SQLGameDAO();
-        } catch (DataAccessException e) {
-            userDAO = new MemoryUserDAO();
-            authDAO = new MemoryAuthDAO();
-            gameDAO = new MemoryGameDAO();
-        }
+//        } catch (DataAccessException e) {
+//            userDAO = new MemoryUserDAO();
+//            authDAO = new MemoryAuthDAO();
+//            gameDAO = new MemoryGameDAO();
+//        }
 
         // Service
         UserService userService = new UserService(userDAO, authDAO);
@@ -59,21 +59,21 @@ public class Server {
         javalin.post("/game", createGameHandler::handle);
         javalin.put("/game", joinGameHandler::handle);
         javalin.delete("/db", clearHandler::handle);
-//       } catch (DataAccessException e) {
-//            throw new RuntimeException("Database failed", e);
-//        }
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Database failed", e);
+        }
         // Exceptions
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).json(new ErrorResponse(e.getMessage()));
         }); // 400: bad request
         javalin.exception(UnauthorizedException.class, (e, ctx) -> {
-            ctx.status(401).json(new ErrorResponse("Error: Internal Error"));
+            ctx.status(401).json(new ErrorResponse(e.getMessage()));
         }); // 401: unauthorized (wrong username/password)
         javalin.exception(AlreadyTakenException.class, (e, ctx) -> {
             ctx.status(403).json(new ErrorResponse(e.getMessage()));
         }); // 403: username already taken
         javalin.exception(Exception.class, (e, ctx) -> {
-            ctx.status(500).json(new ErrorResponse("Error: Internal Error"));
+            ctx.status(500).json(new ErrorResponse(e.getMessage()));
         }); // 500: other errors
     }
 
