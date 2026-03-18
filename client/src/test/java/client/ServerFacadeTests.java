@@ -2,6 +2,7 @@ package client;
 
 import org.junit.jupiter.api.*;
 import server.Server;
+import server.ServerFacade;
 
 /**
  * 3/17/26: added for p5 pre-gameplay
@@ -24,10 +25,10 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-    @BeforeEach
-    static void clearDatabase() {
-        database.clear();
-    }
+//    @BeforeEach
+//    static void clearDatabase {
+//        // use http request to clear database before each test
+//    }
 
     /**
      * ADD ONE POSITIVE AND NEGATIVE PER FUNCTION IN SERVERFACADE
