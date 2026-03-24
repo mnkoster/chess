@@ -2,6 +2,7 @@ package client;
 
 import model.AuthData;
 import ui.State;
+
 import java.util.Scanner;
 
 public class LogoutRepl {
@@ -23,19 +24,19 @@ public class LogoutRepl {
 
             switch (input) {
                 case "help" -> printHelp();
-                case "quit" -> {
-                    System.out.println("Goodbye!");
-                    return State.EXIT;
+                case "register" -> {
+                    if (handleRegister()) {
+                        return State.LOGIN;
+                    }
                 }
                 case "login" -> {
                     if (handleLogin()) {
                         return State.LOGIN;
                     }
                 }
-                case "register" -> {
-                    if (handleRegister()) {
-                        return State.LOGIN;
-                    }
+                case "quit" -> {
+                    System.out.println("Goodbye!");
+                    return State.EXIT;
                 }
                 default -> System.out.println("Unknown command. Type 'help' to see options.");
             }
@@ -45,10 +46,10 @@ public class LogoutRepl {
     private void printHelp() {
         System.out.println("""
             Commands:
-            - help     : Show available commands
-            - login    : Login with your username and password
-            - register : Create a new account
-            - quit     : Exit the program
+            - help                                      : Show available commands
+            - login <USERNAME> <PASSWORD>               : Login with your username and password
+            - register <USERNAME> <PASSWORD> <EMAIL>    : Create a new account
+            - quit                                      : Exit the program
             """);
     }
 
