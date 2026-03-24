@@ -14,6 +14,7 @@ import java.util.Map;
 
 /**
  * 3/23/26: added for p5 client - serverFacade, calls ServerMain endpoints
+ * 3/24/26: updated for p5 client -
  */
 public class ServerFacade {
 
@@ -42,7 +43,7 @@ public class ServerFacade {
 
     // LoginRepl: listGames, joinGames, etc.
 
-    public Map<String, List<Map<String, Object>>> listGames(String authToken) throws Exception {
+    public Map<String, List<GameData>> listGames(String authToken) throws Exception {
         return makeRequest("GET", "/game", null, authToken, null);
     }
 

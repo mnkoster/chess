@@ -1,13 +1,17 @@
 package client;
 
-import model.AuthData;
+import model.GameData;
 import ui.State;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class LoginRepl {
 
     private final ClientSession session;
     private final Scanner scanner = new Scanner(System.in);
+    private List<GameData> currentGames = new ArrayList<>();
 
     public LoginRepl(ClientSession session) {
         this.session = session;
@@ -58,7 +62,7 @@ public class LoginRepl {
                     if (tokens.length != 2) {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                         System.out.println("Usage: observe <ID>");
-                    } else if (handleObservation()) {
+                    } else if (handleObservation(Integer.parseInt(tokens[1]))) {
                         return State.GAMEPLAY;
                     } else {
                         System.out.println("Could not observe game. Make sure ID exists.");
@@ -109,28 +113,66 @@ public class LoginRepl {
         }
     }
 
-    private boolean handleJoinGame(int gameID, String color) {
-        if (color.equals("BLACK") || color.equals("WHITE")) {
-            try {
-                session.server.joinGame(session.authToken, gameID, color);
-                System.out.println("Joining game...");
-                return true;
-            } catch (Exception e) {
-                System.out.println("Join game failed: " + e.getMessage());
-                return false;
-            }
-        } else {
+    private boolean handleJoinGame(int choice, String color) {
+        if (!color.equals("BLACK") && !color.equals("WHITE")) {
             System.out.println("Invalid player color argument");
+            return false;
+        }
+        if (choice < 1 || choice > currentGames.size()) {
+            System.out.println("Invalid game selection. Run 'list' again.");
+            return false;
+        }
+
+        var selectedGame = currentGames.get(choice - 1);
+        int realGameID = selectedGame.gameID();
+        session.gameplayID = selectedGame.gameID();
+
+        try {
+            session.server.joinGame(session.authToken, realGameID, color);
+            System.out.println("Joining game...");
+            return true;
+        } catch (Exception e) {
+            System.out.println("Join game failed: " + e.getMessage());
             return false;
         }
     }
 
     private boolean handleListGames() {
+        try {
+            var result = session.server.listGames(session.authToken);
+            currentGames = result.get("games");
 
+            if (currentGames == null || currentGames.isEmpty()) {
+                System.out.println("No games available.");
+                return true;
+            }
+
+            int index = 1;
+            for (var game : currentGames) {
+                String name = game.gameName();
+                String white = game.whiteUsername();
+                String black = game.blackUsername();
+                System.out.println(index + " - " + name +
+                        " | White: " + white +
+                        " | Black: " + black);
+                index++;
+            }
+            return true;
+        } catch (Exception e) {
+            System.out.println("List games failed: " + e.getMessage());
+            return false;
+        }
     }
 
-    private boolean handleObservation() {
-
+    private boolean handleObservation(int choice) {
+        if (choice < 1 || choice > currentGames.size()) {
+            System.out.println("Invalid game selection. Run 'list' first.");
+            return false;
+        }
+        var selectedGame = currentGames.get(choice - 1);
+        session.gameplayID = selectedGame.gameID();
+        System.out.println("Observing game...");
+        return true;
     }
 
     private boolean handleLogout() {
@@ -139,6 +181,7 @@ public class LoginRepl {
             return true;
         } catch (Exception e) {
             System.out.println("Failed to logout: " + e.getMessage());
+            return false;
         }
     }
 }

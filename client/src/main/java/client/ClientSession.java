@@ -7,6 +7,7 @@ public class ClientSession {
     public String authToken;
     public String username;
     public ServerFacade server;
+    public int gameplayID;
 
     public ClientSession(String serverUrl) {
         this.server = new ServerFacade(serverUrl);
