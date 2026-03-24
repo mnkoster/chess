@@ -33,7 +33,7 @@ public class LoginRepl {
                 }
                 case "join" -> {
                     if (handleJoinGame()) {
-                        return State.OBSERVE; // change to GAMEPLAY in p6
+                        return State.GAMEPLAY;
                     }
                 }
                 case "observe" -> {
