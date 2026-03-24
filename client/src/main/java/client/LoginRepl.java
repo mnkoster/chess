@@ -13,41 +13,73 @@ public class LoginRepl {
     }
 
     public State run() {
-        System.out.println("=== Welcome to Chess ===");
+        System.out.println("=== Logged into Chess ===");
         printHelp();
 
         while (true) {
             System.out.print("\n[LOGGED IN] >>> ");
-            String input = scanner.nextLine().trim().toLowerCase();
+            String input = scanner.nextLine().trim();
+            String[] tokens = input.split("\\s+");
+            String command = tokens[0];
 
-            switch (input) {
+            switch (command) {
                 case "create" -> {
-                    if (handleCreateGame()) {
-                        return State.GAMEPLAY;
+                    if (tokens.length != 2) {
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
+                        System.out.println("Usage: create <NAME>");
+                    } else if (handleCreateGame()) {
+                        System.out.println("Game created. You can now find it in the list and join the game.");
+                        return State.LOGIN;
+                    } else {
+                        System.out.println("Could not observe game. Make sure ID exists.");
                     }
                 }
                 case "list" -> {
-                    if (handleListGames()) {
+                    if (tokens.length != 1) {
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
+                    } else if (handleListGames()) {
                         return State.LOGIN;
+                    } else {
+                        System.out.println("Could not list games. Try again.");
                     }
                 }
                 case "join" -> {
-                    if (handleJoinGame()) {
+                    if (tokens.length != 3) {
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
+                        System.out.println("Usage: join <ID> [WHITE|BLACK]");
+                    } else if (handleJoinGame()) {
                         return State.GAMEPLAY;
+                    } else {
+                        System.out.println("Could not observe game. Make sure ID exists.");
                     }
                 }
                 case "observe" -> {
-                    if (handleObservation()) {
-                        return State.OBSERVE;
+                    if (tokens.length != 2) {
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
+                        System.out.println("Usage: observe <ID>");
+                    } else if (handleObservation()) {
+                        return State.GAMEPLAY;
+                    } else {
+                        System.out.println("Could not observe game. Make sure ID exists.");
                     }
                 }
                 case "logout" -> {
-                    if (handleLogout()) {
+                    if (tokens.length != 1) {
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
+                    } else if (handleLogout()) {
                         System.out.println("Logging out...");
                         return State.LOGOUT;
+                    } else {
+                        System.out.println("Could not log out. Try again.");
                     }
                 }
-                case "help" -> printHelp();
+                case "help" -> {
+                    if (tokens.length != 1) {
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
+                    } else {
+                        printHelp();
+                    }
+                }
                 default -> System.out.println("Unknown command. Type 'help' to see options.");
             }
         }
@@ -59,7 +91,7 @@ public class LoginRepl {
             - help                                      : Show available commands
             - create <NAME>                             : Create new game
             - list                                      : List existing games
-            - join <ID>                                 : Join game under ID
+            - join <ID> [WHITE | BLACK]                 : Join game under ID
             - observe <ID>                              : Observe game under ID
             - logout                                    : Logout (logout to quit program)
             """);

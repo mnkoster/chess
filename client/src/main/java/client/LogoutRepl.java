@@ -34,7 +34,7 @@ public class LogoutRepl {
                 }
                 case "register" -> {
                     if (tokens.length != 4) {
-                        System.out.println("Invalid number of arguments.");
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
                         System.out.println("Usage: register <USERNAME> <PASSWORD> <EMAIL>");
                     } else if (handleRegister(tokens[1], tokens[2], tokens[3])) {
                         return State.LOGIN;
