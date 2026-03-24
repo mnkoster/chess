@@ -1,7 +1,5 @@
 package client;
 
-import server.ServerFacade;
-
 /**
  * 3/23/26: added for p5 client - shared variables
  */
