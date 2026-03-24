@@ -1,5 +1,6 @@
 package client;
 
+import model.AuthData;
 import ui.State;
 import java.util.Scanner;
 
@@ -27,7 +28,7 @@ public class LoginRepl {
                     if (tokens.length != 2) {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                         System.out.println("Usage: create <NAME>");
-                    } else if (handleCreateGame()) {
+                    } else if (handleCreateGame(tokens[1])) {
                         System.out.println("Game created. You can now find it in the list and join the game.");
                         return State.LOGIN;
                     } else {
@@ -47,7 +48,7 @@ public class LoginRepl {
                     if (tokens.length != 3) {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                         System.out.println("Usage: join <ID> [WHITE|BLACK]");
-                    } else if (handleJoinGame()) {
+                    } else if (handleJoinGame(Integer.parseInt(tokens[1]), tokens[2])) {
                         return State.GAMEPLAY;
                     } else {
                         System.out.println("Could not observe game. Make sure ID exists.");
@@ -95,5 +96,49 @@ public class LoginRepl {
             - observe <ID>                              : Observe game under ID
             - logout                                    : Logout (logout to quit program)
             """);
+    }
+
+    private boolean handleCreateGame(String name) {
+        try {
+            session.server.createGame(session.authToken, name);
+            System.out.println("Successfully created game.");
+            return true;
+        } catch (Exception e) {
+            System.out.println("Create game failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean handleJoinGame(int gameID, String color) {
+        if (color.equals("BLACK") || color.equals("WHITE")) {
+            try {
+                session.server.joinGame(session.authToken, gameID, color);
+                System.out.println("Joining game...");
+                return true;
+            } catch (Exception e) {
+                System.out.println("Join game failed: " + e.getMessage());
+                return false;
+            }
+        } else {
+            System.out.println("Invalid player color argument");
+            return false;
+        }
+    }
+
+    private boolean handleListGames() {
+
+    }
+
+    private boolean handleObservation() {
+
+    }
+
+    private boolean handleLogout() {
+        try {
+            session.server.logout(session.authToken);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Failed to logout: " + e.getMessage());
+        }
     }
 }

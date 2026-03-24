@@ -42,26 +42,26 @@ public class ServerFacade {
 
     // LoginRepl: listGames, joinGames, etc.
 
-//    public Map<String, List<Map<String, Object>>> listGames(String authToken) throws Exception {
-//        return makeRequest("GET", "/game", null, authToken, null);
-//    }
-//
-//    public CreateGameResult createGame(String authToken, String gameName) throws Exception {
-//        var request = new CreateGameRequest(gameName);
-//        return makeRequest("POST", "/game", request, authToken, null);
-//    }
-//
-//    public void joinGame(String authToken, int gameID, String playerColor) throws Exception {
-//        var request = new JoinGameRequest(gameID, playerColor);
-//        makeRequest("PUT", "/game", request, authToken, null);
-//    }
-//
-//    // Generic
-//
-//    public void clear() throws Exception {
-//        makeRequest("DELETE", "/db", null, null, null);
-//    }
-//
+    public Map<String, List<Map<String, Object>>> listGames(String authToken) throws Exception {
+        return makeRequest("GET", "/game", null, authToken, null);
+    }
+
+    public void createGame(String authToken, String gameName) throws Exception {
+        var request = new CreateGameRequest(gameName);
+        makeRequest("POST", "/game", request, authToken, null);
+    }
+
+    public void joinGame(String authToken, int gameID, String playerColor) throws Exception {
+        var request = new JoinGameRequest(gameID, playerColor);
+        makeRequest("PUT", "/game", request, authToken, null);
+    }
+
+    // Generic
+
+    public void clear() throws Exception {
+        makeRequest("DELETE", "/db", null, null, null);
+    }
+
     private <T> T makeRequest(String method, String path, Object body, String authToken, Class<T> responseClass)
             throws Exception {
 
