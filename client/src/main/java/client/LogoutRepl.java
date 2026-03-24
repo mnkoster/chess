@@ -1,5 +1,6 @@
 package client;
 
+import model.AuthData;
 import ui.State;
 import java.util.Scanner;
 
@@ -57,12 +58,15 @@ public class LogoutRepl {
         System.out.print("Password: ");
         String password = scanner.nextLine();
 
-        boolean success = session.server.login(username, password);
-        if (success) {
+        try {
+            AuthData auth = session.server.login(username, password);
+            session.authToken = auth.authToken();
+            session.username = auth.username();
+
             System.out.println("Login successful!");
             return true;
-        } else {
-            System.out.println("Login failed.");
+        } catch (Exception e) {
+            System.out.println("Login failed: " + e.getMessage());
             return false;
         }
     }
@@ -75,12 +79,15 @@ public class LogoutRepl {
         System.out.print("Email: ");
         String email = scanner.nextLine();
 
-        boolean success = session.server.register(username, password, email);
-        if (success) {
+        try {
+            AuthData auth = session.server.register(username, password, email);
+            session.authToken = auth.authToken();
+            session.username = auth.username();
+
             System.out.println("Registration successful! You are now logged in.");
             return true;
-        } else {
-            System.out.println("Registration failed.");
+        } catch (Exception e) {
+            System.out.println("Registration failed: " + e.getMessage());
             return false;
         }
     }
