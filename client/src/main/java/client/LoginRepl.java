@@ -34,7 +34,6 @@ public class LoginRepl {
                         System.out.println("Usage: create <NAME>");
                     } else if (handleCreateGame(tokens[1])) {
                         System.out.println("Game created. You can now find it in the list and join the game.");
-                        return State.LOGIN;
                     } else {
                         System.out.println("Could not observe game. Make sure ID exists.");
                     }
@@ -42,9 +41,7 @@ public class LoginRepl {
                 case "list" -> {
                     if (tokens.length != 1) {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
-                    } else if (handleListGames()) {
-                        return State.LOGIN;
-                    } else {
+                    } else if (!handleListGames()) {
                         System.out.println("Could not list games. Try again.");
                     }
                 }
@@ -55,7 +52,7 @@ public class LoginRepl {
                     } else if (handleJoinGame(Integer.parseInt(tokens[1]), tokens[2])) {
                         return State.GAMEPLAY;
                     } else {
-                        System.out.println("Could not observe game. Make sure ID exists.");
+                        System.out.println("Could not join game. Make sure ID exists.");
                     }
                 }
                 case "observe" -> {
@@ -105,7 +102,7 @@ public class LoginRepl {
     private boolean handleCreateGame(String name) {
         try {
             session.server.createGame(session.authToken, name);
-            System.out.println("Successfully created game.");
+            System.out.println("Creating game...");
             return true;
         } catch (Exception e) {
             System.out.println("Create game failed: " + e.getMessage());

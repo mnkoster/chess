@@ -53,6 +53,11 @@ public class LogoutRepl {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                         return State.LOGOUT;
                     }
+                    try {
+                        session.server.clear();
+                    } catch (Exception e){
+                        System.out.println("Unable to clear db.");
+                    }
                     System.out.println("Exiting program...");
                     return State.EXIT;
                 }
@@ -80,7 +85,10 @@ public class LogoutRepl {
             System.out.println("Login successful!");
             return true;
         } catch (Exception e) {
-            System.out.println("Login failed: " + e.getMessage());
+            String raw = e.getMessage();
+            String cleaned = raw.replaceAll(".*\"message\":\"", "")
+                    .replaceAll("\".*", "").replaceFirst("^Error:\\s*", "");
+            System.out.println("Login failed: " + cleaned);
             return false;
         }
     }
@@ -94,7 +102,10 @@ public class LogoutRepl {
             System.out.println("Registration successful! You are now logged in.");
             return true;
         } catch (Exception e) {
-            System.out.println("Registration failed: " + e.getMessage());
+            String raw = e.getMessage();
+            String cleaned = raw.replaceAll(".*\"message\":\"", "")
+                    .replaceAll("\".*", "").replaceFirst("^Error:\\s*", "");
+            System.out.println("Registration failed: " + cleaned);
             return false;
         }
     }
