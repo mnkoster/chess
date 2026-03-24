@@ -6,7 +6,6 @@ package ui;
 public enum State {
     LOGOUT,
     LOGIN,
-    OBSERVE,
     GAMEPLAY,
     EXIT
 }
