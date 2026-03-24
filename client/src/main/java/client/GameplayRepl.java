@@ -107,23 +107,23 @@ public class GameplayRepl {
 
     private String getPieceAt(int row, int col) {
         // Pawns
-        if (row == 2) return EscapeSequences.WHITE_PAWN;
-        if (row == 7) return EscapeSequences.BLACK_PAWN;
+        if (row == 2) { return EscapeSequences.WHITE_PAWN; }
+        if (row == 7) { return EscapeSequences.BLACK_PAWN; }
         // Rooks
-        if (row == 1 && (col == 1 || col == 8)) return EscapeSequences.WHITE_ROOK;
-        if (row == 8 && (col == 1 || col == 8)) return EscapeSequences.BLACK_ROOK;
+        if (row == 1 && (col == 1 || col == 8)) { return EscapeSequences.WHITE_ROOK; }
+        if (row == 8 && (col == 1 || col == 8)) { return EscapeSequences.BLACK_ROOK; }
         // Knights
-        if (row == 1 && (col == 2 || col == 7)) return EscapeSequences.WHITE_KNIGHT;
-        if (row == 8 && (col == 2 || col == 7)) return EscapeSequences.BLACK_KNIGHT;
+        if (row == 1 && (col == 2 || col == 7)) { return EscapeSequences.WHITE_KNIGHT; }
+        if (row == 8 && (col == 2 || col == 7)) { return EscapeSequences.BLACK_KNIGHT; }
         // Bishops
-        if (row == 1 && (col == 3 || col == 6)) return EscapeSequences.WHITE_BISHOP;
-        if (row == 8 && (col == 3 || col == 6)) return EscapeSequences.BLACK_BISHOP;
+        if (row == 1 && (col == 3 || col == 6)) { return EscapeSequences.WHITE_BISHOP; }
+        if (row == 8 && (col == 3 || col == 6)) { return EscapeSequences.BLACK_BISHOP; }
         // Queens
-        if (row == 1 && col == 4) return EscapeSequences.WHITE_QUEEN;
-        if (row == 8 && col == 4) return EscapeSequences.BLACK_QUEEN;
+        if (row == 1 && col == 4) { return EscapeSequences.WHITE_QUEEN; }
+        if (row == 8 && col == 4) { return EscapeSequences.BLACK_QUEEN; }
         // Kings
-        if (row == 1 && col == 5) return EscapeSequences.WHITE_KING;
-        if (row == 8 && col == 5) return EscapeSequences.BLACK_KING;
+        if (row == 1 && col == 5) { return EscapeSequences.WHITE_KING; }
+        if (row == 8 && col == 5) { return EscapeSequences.BLACK_KING; }
 
         return EscapeSequences.EMPTY;
     }
