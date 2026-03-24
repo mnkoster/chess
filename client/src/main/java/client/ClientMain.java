@@ -10,7 +10,9 @@ public class ClientMain {
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         System.out.println("♕ 240 Chess Client: " + piece);
 
-        ClientSession session = new ClientSession();
+        String serverUrl = "http://localhost:8080";
+        ClientSession session = new ClientSession(serverUrl);
+
         ReplController repl = new ReplController(session);
         repl.run();
     }
