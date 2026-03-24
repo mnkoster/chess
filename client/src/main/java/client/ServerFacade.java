@@ -43,8 +43,8 @@ public class ServerFacade {
 
     // LoginRepl: listGames, joinGames, etc.
 
-    public Map<String, List<GameData>> listGames(String authToken) throws Exception {
-        return makeRequest("GET", "/game", null, authToken, null);
+    public ListGamesResult listGames(String authToken) throws Exception {
+        return makeRequest("GET", "/game", null, authToken, ListGamesResult.class);
     }
 
     public void createGame(String authToken, String gameName) throws Exception {

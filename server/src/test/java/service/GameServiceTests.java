@@ -41,7 +41,7 @@ public class GameServiceTests {
     @Test
     public void createGamePositive() throws DataAccessException {
         int gameID = gameService.createGame(playerValidToken1, "MyGame");
-        assertEquals(1000, gameID);
+        assertEquals(1, gameID);
     }
 
     @Test

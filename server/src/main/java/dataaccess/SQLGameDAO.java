@@ -9,9 +9,11 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * 3/11/26: added for p4 database
+ * 3/24/26: updated for p5 client - list is now List
  */
 public class SQLGameDAO implements GameDAO {
 
@@ -43,9 +45,9 @@ public class SQLGameDAO implements GameDAO {
 
     // Interface function - added 3/11/26
     @Override
-    public Collection<GameData> getListGames() throws DataAccessException {
+    public List<GameData> getListGames() throws DataAccessException {
         var listGames = "SELECT * FROM games";
-        Collection<GameData> gamesList = new ArrayList<>();
+        List<GameData> gamesList = new ArrayList<>();
 
         try (var conn = DatabaseManager.getConnection();
              var statement = conn.prepareStatement(listGames);

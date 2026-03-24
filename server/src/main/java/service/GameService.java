@@ -1,6 +1,7 @@
 package service;
 
 import java.util.Collection;
+import java.util.List;
 
 import chess.ChessGame;
 import dataaccess.AuthDAO;
@@ -15,6 +16,7 @@ import model.GameData;
 /**
  * 3/2/26: added for p3 apis - games
  * 3/10/26: updated for p4 database - DataAccessExceptions
+ * 3/24/26: updated for p5 client - list is now List
  */
 public class GameService {
 
@@ -26,7 +28,7 @@ public class GameService {
         this.authDAO = authDAO;
     }
 
-    public Collection<GameData> getListGames(String authToken) throws DataAccessException {
+    public List<GameData> getListGames(String authToken) throws DataAccessException {
         if (authToken == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }

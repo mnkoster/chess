@@ -3,22 +3,21 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 3/1/26: added for p3 apis - clear() first for /db
  * 3/2/26: added for p3 apis - getGames(), createGame(), getGame(), updateGame()
+ * 3/24/26: updated for p5 client - list is now List
  */
 public class MemoryGameDAO implements GameDAO {
 
-    private final Map<Integer, GameData> games = new HashMap<>();
+    private final List<GameData> games = new ArrayList<>();
     private int nextGameID = 1;
 
     @Override
-    public Collection<GameData> getListGames() {
-        return games.values();
+    public List<GameData> getListGames() {
+        return games;
     }
 
     @Override
@@ -26,18 +25,28 @@ public class MemoryGameDAO implements GameDAO {
         int id = nextGameID;
         nextGameID++;
         GameData game = new GameData(id, null, null, gameName, new ChessGame());
-        games.put(id, game);
+        games.add(game);
         return id;
     }
 
     @Override
     public GameData getGame(int gameID) {
-        return games.get(gameID);
+        for (GameData game : games) {
+            if (game.gameID() == gameID) {
+                return game;
+            }
+        }
+        return null;
     }
 
     @Override
-    public void updateGame(GameData game) {
-        games.put(game.gameID(), game);
+    public void updateGame(GameData updatedGame) {
+        for (int i = 0; i < games.size(); i++) {
+            if (games.get(i).gameID() == updatedGame.gameID()) {
+                games.set(i, updatedGame);
+                return;
+            }
+        }
     }
 
     @Override

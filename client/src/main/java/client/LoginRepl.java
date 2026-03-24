@@ -140,7 +140,7 @@ public class LoginRepl {
     private boolean handleListGames() {
         try {
             var result = session.server.listGames(session.authToken);
-            currentGames = result.get("games");
+            currentGames = result.getGames();
 
             if (currentGames == null || currentGames.isEmpty()) {
                 System.out.println("No games available.");
