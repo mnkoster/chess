@@ -17,6 +17,8 @@ public class GameplayRepl {
     }
 
     public State run() {
+        System.out.println("=== Entered Game ===");
+        printHelp();
         drawBoard();
 
         while (true) {

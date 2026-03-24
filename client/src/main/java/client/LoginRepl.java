@@ -49,7 +49,7 @@ public class LoginRepl {
                     if (tokens.length != 3) {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                         System.out.println("Usage: join <ID> [WHITE|BLACK]");
-                    } else if (handleJoinGame(Integer.parseInt(tokens[1]), tokens[2])) {
+                    } else if (handleJoinGame(tokens[1], tokens[2])) {
                         return State.GAMEPLAY;
                     } else {
                         System.out.println("Could not join game. Make sure ID exists.");
@@ -59,7 +59,7 @@ public class LoginRepl {
                     if (tokens.length != 2) {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                         System.out.println("Usage: observe <ID>");
-                    } else if (handleObservation(Integer.parseInt(tokens[1]))) {
+                    } else if (handleObservation(tokens[1])) {
                         return State.GAMEPLAY;
                     } else {
                         System.out.println("Could not observe game. Make sure ID exists.");
@@ -110,9 +110,16 @@ public class LoginRepl {
         }
     }
 
-    private boolean handleJoinGame(int choice, String color) {
+    private boolean handleJoinGame(String gameNumber, String color) {
         if (!color.equals("BLACK") && !color.equals("WHITE")) {
             System.out.println("Invalid player color argument");
+            return false;
+        }
+        int choice;
+        try {
+            choice = Integer.parseInt(gameNumber);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid ID. Must be a number.");
             return false;
         }
         if (choice < 1 || choice > currentGames.size()) {
@@ -122,11 +129,11 @@ public class LoginRepl {
 
         var selectedGame = currentGames.get(choice - 1);
         int realGameID = selectedGame.gameID();
-        session.gameplayID = selectedGame.gameID();
 
         try {
             session.server.joinGame(session.authToken, realGameID, color);
             System.out.println("Joining game...");
+            session.gameplayID = selectedGame.gameID();
             session.playerWhite = color.equals("WHITE");
             return true;
         } catch (Exception e) {
@@ -162,7 +169,14 @@ public class LoginRepl {
         }
     }
 
-    private boolean handleObservation(int choice) {
+    private boolean handleObservation(String gameNumber) {
+        int choice;
+        try {
+            choice = Integer.parseInt(gameNumber);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid ID. Must be a number.");
+            return false;
+        }
         if (choice < 1 || choice > currentGames.size()) {
             System.out.println("Invalid game selection. Run 'list' first.");
             return false;
