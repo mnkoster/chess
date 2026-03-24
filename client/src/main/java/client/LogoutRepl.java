@@ -20,25 +20,43 @@ public class LogoutRepl {
 
         while (true) {
             System.out.print("\n[LOGGED OUT] >>> ");
-            String input = scanner.nextLine().trim().toLowerCase();
+            String input = scanner.nextLine().trim();
+            String[] tokens = input.split("\\s+");
+            String command = tokens[0];
 
-            switch (input) {
-                case "help" -> printHelp();
+            switch (command) {
+                case "help" -> {
+                    if (tokens.length != 1) {
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
+                    } else {
+                        printHelp();
+                    }
+                }
                 case "register" -> {
-                    if (handleRegister()) {
+                    if (tokens.length != 4) {
+                        System.out.println("Invalid number of arguments.");
+                        System.out.println("Usage: register <USERNAME> <PASSWORD> <EMAIL>");
+                    } else if (handleRegister(tokens[1], tokens[2], tokens[3])) {
                         return State.LOGIN;
                     }
                 }
                 case "login" -> {
-                    if (handleLogin()) {
+                    if (tokens.length != 3) {
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
+                        System.out.println("Usage: login <USERNAME> <PASSWORD>");
+                    } else if (handleLogin(tokens[1], tokens[2])) {
                         return State.LOGIN;
                     }
                 }
                 case "quit" -> {
-                    System.out.println("Goodbye!");
+                    if (tokens.length != 1) {
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
+                        return State.LOGOUT;
+                    }
+                    System.out.println("Exiting program...");
                     return State.EXIT;
                 }
-                default -> System.out.println("Unknown command. Type 'help' to see options.");
+                default -> System.out.println("Invalid command. Type 'help' to see options.");
             }
         }
     }
@@ -53,12 +71,7 @@ public class LogoutRepl {
             """);
     }
 
-    private boolean handleLogin() {
-        System.out.print("Username: ");
-        String username = scanner.nextLine();
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
-
+    private boolean handleLogin(String username, String password) {
         try {
             AuthData auth = session.server.login(username, password);
             session.authToken = auth.authToken();
@@ -72,14 +85,7 @@ public class LogoutRepl {
         }
     }
 
-    private boolean handleRegister() {
-        System.out.print("Username: ");
-        String username = scanner.nextLine();
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-
+    private boolean handleRegister(String username, String password, String email) {
         try {
             AuthData auth = session.server.register(username, password, email);
             session.authToken = auth.authToken();
