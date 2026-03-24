@@ -8,6 +8,7 @@ public class ClientSession {
     public String username;
     public ServerFacade server;
     public int gameplayID;
+    public boolean playerWhite;
 
     public ClientSession(String serverUrl) {
         this.server = new ServerFacade(serverUrl);

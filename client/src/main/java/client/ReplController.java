@@ -21,7 +21,7 @@ public class ReplController {
             state = switch (state) {
                 case LOGOUT -> new LogoutRepl(session).run();
                 case LOGIN -> new LoginRepl(session).run();
-//                case GAMEPLAY -> new GameplayRepl(session).run();
+                case GAMEPLAY -> new GameplayRepl(session).run();
                 default -> State.EXIT;
             };
         }

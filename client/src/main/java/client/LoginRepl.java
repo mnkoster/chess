@@ -127,6 +127,7 @@ public class LoginRepl {
         try {
             session.server.joinGame(session.authToken, realGameID, color);
             System.out.println("Joining game...");
+            session.playerWhite = color.equals("WHITE");
             return true;
         } catch (Exception e) {
             System.out.println("Join game failed. Try again.");
@@ -168,6 +169,7 @@ public class LoginRepl {
         }
         var selectedGame = currentGames.get(choice - 1);
         session.gameplayID = selectedGame.gameID();
+        session.playerWhite = true;
         System.out.println("Observing game...");
         return true;
     }
