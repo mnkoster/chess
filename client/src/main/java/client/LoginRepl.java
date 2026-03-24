@@ -105,7 +105,7 @@ public class LoginRepl {
             System.out.println("Creating game...");
             return true;
         } catch (Exception e) {
-            System.out.println("Create game failed: " + e.getMessage());
+            System.out.println("Create game failed. Try again.");
             return false;
         }
     }
@@ -129,7 +129,7 @@ public class LoginRepl {
             System.out.println("Joining game...");
             return true;
         } catch (Exception e) {
-            System.out.println("Join game failed: " + e.getMessage());
+            System.out.println("Join game failed. Try again.");
             return false;
         }
     }
@@ -156,7 +156,7 @@ public class LoginRepl {
             }
             return true;
         } catch (Exception e) {
-            System.out.println("List games failed: " + e.getMessage());
+            System.out.println("List games failed. Try again.");
             return false;
         }
     }
@@ -177,7 +177,7 @@ public class LoginRepl {
             session.server.logout(session.authToken);
             return true;
         } catch (Exception e) {
-            System.out.println("Failed to logout: " + e.getMessage());
+            System.out.println("Failed to logout. Try again.");
             return false;
         }
     }
