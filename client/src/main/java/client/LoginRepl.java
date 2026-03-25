@@ -52,7 +52,7 @@ public class LoginRepl {
                     } else if (handleJoinGame(tokens[1], tokens[2])) {
                         return State.GAMEPLAY;
                     } else {
-                        System.out.println("Could not join game. Make sure ID exists.");
+                        System.out.println("Could not join game. Usage: join <ID> [WHITE|BLACK].");
                     }
                 }
                 case "observe" -> {
@@ -105,7 +105,10 @@ public class LoginRepl {
             System.out.println("Creating game...");
             return true;
         } catch (Exception e) {
-            System.out.println("Create game failed. Try again.");
+            String raw = e.getMessage();
+            String cleaned = raw.replaceAll(".*\"message\":\"", "")
+                    .replaceAll("\".*", "").replaceFirst("^Error:\\s*", "");
+            System.out.println("Create game failed: " + cleaned);
             return false;
         }
     }
@@ -137,7 +140,10 @@ public class LoginRepl {
             session.playerWhite = color.equals("WHITE");
             return true;
         } catch (Exception e) {
-            System.out.println("Join game failed. Try again.");
+            String raw = e.getMessage();
+            String cleaned = raw.replaceAll(".*\"message\":\"", "")
+                    .replaceAll("\".*", "").replaceFirst("^Error:\\s*", "");
+            System.out.println("Join game failed: " + cleaned);
             return false;
         }
     }
@@ -164,7 +170,10 @@ public class LoginRepl {
             }
             return true;
         } catch (Exception e) {
-            System.out.println("List games failed. Try again.");
+            String raw = e.getMessage();
+            String cleaned = raw.replaceAll(".*\"message\":\"", "")
+                    .replaceAll("\".*", "").replaceFirst("^Error:\\s*", "");
+            System.out.println("List game failed: " + cleaned);
             return false;
         }
     }

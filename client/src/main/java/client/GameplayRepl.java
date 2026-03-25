@@ -58,10 +58,25 @@ public class GameplayRepl {
     private void printHelp() {
         System.out.println("""
         Commands:
-            - help                                      : Show available commands
-            - redraw                                    : Redraw the board
-            - exit                                      : Leave game (return to login)
+        - help                                      : Show available commands
+        - redraw                                    : Redraw the board
+        - exit                                      : Leave game (return to login)
         """);
+    }
+
+    private void drawColumn() {
+        int startCol = isWhitePerspective ? 1 : 8;
+        int endCol   = isWhitePerspective ? 8 : 1;
+        int colStep  = isWhitePerspective ? 1 : -1;
+
+        System.out.print("    ");
+        for (int col = startCol;
+             isWhitePerspective ? col <= endCol : col >= endCol;
+             col += colStep) {
+            char file = (char) ('a' + col - 1);
+            System.out.print(" " + file + " ");
+        }
+        System.out.println();
     }
 
     private void drawBoard() {
@@ -74,6 +89,8 @@ public class GameplayRepl {
         int startCol = isWhitePerspective ? 1 : 8;
         int endCol   = isWhitePerspective ? 8 : 1;
         int colStep  = isWhitePerspective ? 1 : -1;
+
+        drawColumn();
 
         for (int row = startRow;
              isWhitePerspective ? row >= endRow : row <= endRow;
@@ -92,17 +109,10 @@ public class GameplayRepl {
                 String piece = getPieceAt(row, col);
                 System.out.print(bgColor + piece + EscapeSequences.RESET_BG_COLOR);
             }
+            System.out.print(" " + row + " ");
             System.out.println();
         }
-        // Column labels
-        System.out.print("    ");
-        for (int col = startCol;
-             isWhitePerspective ? col <= endCol : col >= endCol;
-             col += colStep) {
-            char file = (char) ('a' + col - 1);
-            System.out.print(" " + file + " ");
-        }
-        System.out.println();
+        drawColumn();
     }
 
     private String getPieceAt(int row, int col) {
