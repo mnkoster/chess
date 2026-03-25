@@ -69,12 +69,12 @@ public class GameplayRepl {
         int endCol   = isWhitePerspective ? 8 : 1;
         int colStep  = isWhitePerspective ? 1 : -1;
 
-        System.out.print("    ");
+        System.out.print("  ");
         for (int col = startCol;
              isWhitePerspective ? col <= endCol : col >= endCol;
              col += colStep) {
             char file = (char) ('a' + col - 1);
-            System.out.print(" " + file + " ");
+            System.out.print(" \u2003" + file);
         }
         System.out.println();
     }

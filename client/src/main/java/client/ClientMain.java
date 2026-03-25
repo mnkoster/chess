@@ -9,7 +9,7 @@ public class ClientMain {
     public static void main(String[] args) {
         System.out.println("♕ 240 Chess Client");
 
-        String serverUrl = "http://localhost:59124";
+        String serverUrl = "http://localhost:52750";
         ClientSession session = new ClientSession(serverUrl);
 
         ReplController repl = new ReplController(session);
