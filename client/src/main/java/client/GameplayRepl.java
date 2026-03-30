@@ -69,12 +69,13 @@ public class GameplayRepl {
         int endCol   = isWhitePerspective ? 8 : 1;
         int colStep  = isWhitePerspective ? 1 : -1;
 
-        System.out.print("  ");
+        System.out.print(" ");
         for (int col = startCol;
              isWhitePerspective ? col <= endCol : col >= endCol;
              col += colStep) {
             char file = (char) ('a' + col - 1);
-            System.out.print(" \u2003" + file);
+//            System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY + " \u2003" + file + EscapeSequences.RESET_BG_COLOR);
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + " \u2003  " + file);
         }
         System.out.println();
     }
@@ -104,12 +105,12 @@ public class GameplayRepl {
 
                 boolean isLightSquare = (row + col) % 2 == 0;
                 String bgColor = isLightSquare
-                        ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY
-                        : EscapeSequences.SET_BG_COLOR_DARK_GREY;
+                        ? EscapeSequences.SET_BG_COLOR_GREY
+                        : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
                 String piece = getPieceAt(row, col);
                 System.out.print(bgColor + piece + EscapeSequences.RESET_BG_COLOR);
             }
-            System.out.print(" " + row + " ");
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + " " + row + " ");
             System.out.println();
         }
         drawColumn();
@@ -117,23 +118,23 @@ public class GameplayRepl {
 
     private String getPieceAt(int row, int col) {
         // Pawns
-        if (row == 2) { return EscapeSequences.WHITE_PAWN; }
-        if (row == 7) { return EscapeSequences.BLACK_PAWN; }
+        if (row == 2) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_PAWN; }
+        if (row == 7) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_PAWN; }
         // Rooks
-        if (row == 1 && (col == 1 || col == 8)) { return EscapeSequences.WHITE_ROOK; }
-        if (row == 8 && (col == 1 || col == 8)) { return EscapeSequences.BLACK_ROOK; }
+        if (row == 1 && (col == 1 || col == 8)) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_ROOK; }
+        if (row == 8 && (col == 1 || col == 8)) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_ROOK; }
         // Knights
-        if (row == 1 && (col == 2 || col == 7)) { return EscapeSequences.WHITE_KNIGHT; }
-        if (row == 8 && (col == 2 || col == 7)) { return EscapeSequences.BLACK_KNIGHT; }
+        if (row == 1 && (col == 2 || col == 7)) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KNIGHT; }
+        if (row == 8 && (col == 2 || col == 7)) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KNIGHT; }
         // Bishops
-        if (row == 1 && (col == 3 || col == 6)) { return EscapeSequences.WHITE_BISHOP; }
-        if (row == 8 && (col == 3 || col == 6)) { return EscapeSequences.BLACK_BISHOP; }
+        if (row == 1 && (col == 3 || col == 6)) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_BISHOP; }
+        if (row == 8 && (col == 3 || col == 6)) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_BISHOP; }
         // Queens
-        if (row == 1 && col == 4) { return EscapeSequences.WHITE_QUEEN; }
-        if (row == 8 && col == 4) { return EscapeSequences.BLACK_QUEEN; }
+        if (row == 1 && col == 4) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_QUEEN; }
+        if (row == 8 && col == 4) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_QUEEN; }
         // Kings
-        if (row == 1 && col == 5) { return EscapeSequences.WHITE_KING; }
-        if (row == 8 && col == 5) { return EscapeSequences.BLACK_KING; }
+        if (row == 1 && col == 5) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KING; }
+        if (row == 8 && col == 5) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KING; }
 
         return EscapeSequences.EMPTY;
     }
