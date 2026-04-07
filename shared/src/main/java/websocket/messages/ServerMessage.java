@@ -4,9 +4,9 @@ import java.util.Objects;
 
 /**
  * Represents a Message the server can send through a WebSocket
- * <p>
  * Note: You can add to this class, but you should not alter the existing
  * methods.
+ * 4/6/26: added for p6 websocket - ServerMessage message
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;

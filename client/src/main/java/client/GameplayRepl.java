@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 /**
  * 3/24/26: added for p5 client - gameplay view
+ * 4/6/26: added for p6 websocket - added help commands
  */
 public class GameplayRepl {
 
