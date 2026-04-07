@@ -2,6 +2,8 @@ package client;
 
 import ui.EscapeSequences;
 import ui.State;
+
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -11,9 +13,16 @@ public class GameplayRepl {
 
     private final Scanner scanner = new Scanner(System.in);
     private final boolean isWhitePerspective;
+    ArrayList<String> helpList;
 
     public GameplayRepl(ClientSession session) {
         this.isWhitePerspective = session.playerWhite;
+
+        helpList = new ArrayList<>();
+        helpList.add("   |   Commands: ");
+        helpList.add("   |   help    : Show available commands");
+        helpList.add("   |   redraw  : Redraw the board");
+        helpList.add("   |   exit    : Leave game (return to login)");
     }
 
     public State run() {
@@ -74,7 +83,6 @@ public class GameplayRepl {
              isWhitePerspective ? col <= endCol : col >= endCol;
              col += colStep) {
             char file = (char) ('a' + col - 1);
-//            System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREY + " \u2003" + file + EscapeSequences.RESET_BG_COLOR);
             System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + " \u2003  " + file);
         }
         System.out.println();
@@ -92,7 +100,7 @@ public class GameplayRepl {
         int colStep  = isWhitePerspective ? 1 : -1;
 
         drawColumn();
-
+        int i = 0;
         for (int row = startRow;
              isWhitePerspective ? row >= endRow : row <= endRow;
              row += rowStep) {
@@ -111,6 +119,10 @@ public class GameplayRepl {
                 System.out.print(bgColor + piece + EscapeSequences.RESET_BG_COLOR);
             }
             System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + " " + row + " ");
+            if (i < helpList.size()) {
+                System.out.print(helpList.get(i));
+                i++;
+            }
             System.out.println();
         }
         drawColumn();
