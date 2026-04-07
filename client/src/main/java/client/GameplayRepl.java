@@ -20,9 +20,12 @@ public class GameplayRepl {
 
         helpList = new ArrayList<>();
         helpList.add("   |   Commands: ");
-        helpList.add("   |   help    : Show available commands");
-        helpList.add("   |   redraw  : Redraw the board");
-        helpList.add("   |   exit    : Leave game (return to login)");
+        helpList.add("   |   help       : Show available commands");
+        helpList.add("   |   redraw     : Redraw the board");
+        helpList.add("   |   move       : Make move");
+        helpList.add("   |   resign     : Resign from game");
+        helpList.add("   |   highlight  : Highlight legal moves");
+        helpList.add("   |   exit       : Leave game (return to login)");
     }
 
     public State run() {
@@ -69,6 +72,9 @@ public class GameplayRepl {
         Commands:
         - help                                      : Show available commands
         - redraw                                    : Redraw the board
+        - move                                      : Make move
+        - resign                                    : Resign from game
+        - highlight                                 : Highlight legal moves
         - exit                                      : Leave game (return to login)
         """);
     }
