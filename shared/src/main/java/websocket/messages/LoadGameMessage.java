@@ -2,6 +2,9 @@ package websocket.messages;
 
 import chess.ChessGame;
 
+/**
+ * 4/7/26: added for p6 websocket - messages
+ */
 public class LoadGameMessage extends ServerMessage {
 
     private final ChessGame game;

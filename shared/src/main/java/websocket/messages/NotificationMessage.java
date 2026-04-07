@@ -1,5 +1,8 @@
 package websocket.messages;
 
+/**
+ * 4/7/26: added for p6 websocket - messages
+ */
 public class NotificationMessage extends ServerMessage {
     
     private final String message;
