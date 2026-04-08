@@ -4,7 +4,7 @@ import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
-import jakarta.websocket.Session;
+import org.eclipse.jetty.websocket.api.Session;
 import model.GameData;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
@@ -14,7 +14,7 @@ import websocket.messages.*;
  */
 public class WebSocketHandler {
 
-    private Gson gson;
+    private final Gson gson = new Gson();
     private final ConnectionManager connectionManager;
     private final GameDAO gameDAO;
 //    private final AuthDAO authDAO;
@@ -109,7 +109,7 @@ public class WebSocketHandler {
         try {
             if (session.isOpen()) {
                 String json = gson.toJson(message);
-                session.getBasicRemote().sendText(json);
+                session.getRemote().sendString(json);
             }
         } catch (Exception e) {
             throw new Exception("Error sending notification");
@@ -129,7 +129,7 @@ public class WebSocketHandler {
         try {
             ServerErrorMessage error = new ServerErrorMessage(errorMessage);
             String json = gson.toJson(error);
-            session.getBasicRemote().sendText(json);
+            session.getRemote().sendString(json);
         } catch (Exception e) {
             e.printStackTrace();
         }

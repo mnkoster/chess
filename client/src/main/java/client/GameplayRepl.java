@@ -44,15 +44,14 @@ public class GameplayRepl {
     }
 
     public State run() {
-        System.out.println("=== Entered Game ===");
-        printHelp();
-
         try {
             websocket.connect(session.authToken, session.gameplayID);
         } catch (Exception e) {
             System.out.println("Failed to connect to game");
             return State.LOGIN;
         }
+        System.out.println("=== Entered Game ===");
+        printHelp();
         drawBoard(null, null);
 
         while (true) {

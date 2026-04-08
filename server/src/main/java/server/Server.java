@@ -4,6 +4,8 @@ import io.javalin.Javalin;
 import io.javalin.json.JavalinGson;
 
 import dataaccess.*;
+import server.websocket.ConnectionManager;
+import server.websocket.WebSocketHandler;
 import service.*;
 import handler.*;
 
@@ -13,6 +15,7 @@ import com.google.gson.GsonBuilder;
 /**
  * 3/2/26: added for p3 apis
  * 3/11/26: updated for p4 database
+ * 4/7/26: updated for p6 websocket
  */
 public class Server {
 
@@ -59,6 +62,8 @@ public class Server {
         CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
         JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
         ClearHandler clearHandler = new ClearHandler(clearService);
+        ConnectionManager connectionManager = new ConnectionManager();
+        WebSocketHandler wsHandler = new WebSocketHandler(connectionManager, gameDAO, authDAO);
 
         // Routes
         javalin.post("/user", registerHandler::handle);
@@ -68,6 +73,17 @@ public class Server {
         javalin.post("/game", createGameHandler::handle);
         javalin.put("/game", joinGameHandler::handle);
         javalin.delete("/db", clearHandler::handle);
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(ctx -> {
+                wsHandler.onConnect(ctx.session);
+            });
+            ws.onClose(ctx -> {
+                wsHandler.onClose(ctx.session);
+            });
+            ws.onMessage(ctx -> {
+                wsHandler.onMessage(ctx.session, ctx.message());
+            });
+        });
 
         // Exceptions
         javalin.exception(BadRequestException.class, (e, ctx) -> {

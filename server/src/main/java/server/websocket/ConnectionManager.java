@@ -1,10 +1,9 @@
 package server.websocket;
 
 import com.google.gson.Gson;
-import jakarta.websocket.Session;
+import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -55,12 +54,12 @@ public class ConnectionManager {
         try {
             if (session.isOpen()) {
                 String json = gson.toJson(message);
-                session.getAsyncRemote().sendText(json);
+                session.getRemote().sendString(json);
             }
         } catch (Exception e) {
             try {
                 session.close();
-            } catch (IOException ignored) {
+            } catch (Exception ex) {
                 removeSessionFromAllGames(session);
             }
         }
