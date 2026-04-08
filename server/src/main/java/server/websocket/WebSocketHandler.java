@@ -1,6 +1,5 @@
 package server.websocket;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
@@ -69,7 +68,8 @@ public class WebSocketHandler {
     }
 
     private void handleMakeMove(Session session, UserGameCommand command) {
-        // user actions: validate move, update game, save to DB, broadcase (load game, notification)
+        // user actions: validate move, update game, save to DB, broadcast (load game, notification)
+
     }
 
     private void handleLeave(Session session, UserGameCommand command) {
@@ -90,7 +90,7 @@ public class WebSocketHandler {
 
     private void sendError(Session session, String errorMessage) {
         try {
-            ErrorResponse error = new ErrorResponse(errorMessage);
+            ServerErrorMessage error = new ServerErrorMessage(errorMessage);
             String json = gson.toJson(error);
             session.getBasicRemote().sendText(json);
         } catch (Exception e) {

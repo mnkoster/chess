@@ -3,7 +3,6 @@ package handler;
 import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
-import java.util.Map;
 
 import results.ListGamesResult;
 import service.GameService;
