@@ -6,6 +6,7 @@ import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
 
+import javax.management.NotificationFilter;
 import java.net.URI;
 
 /**
@@ -15,11 +16,12 @@ public class WebSocketFacade {
 
     private Session session;
     private final Gson gson = new Gson();
-    private final NotificationHandler notifyHandler = new NotificationHandler();
+    private final NotificationHandler notifyHandler;
     private final URI serverUri;
 
-    public WebSocketFacade(String url) throws Exception {
+    public WebSocketFacade(String url, NotificationHandler handler) throws Exception {
         this.serverUri = new URI(url);
+        this.notifyHandler = handler;
     }
 
     public void connect(String authToken, int gameID) throws Exception {
@@ -75,7 +77,7 @@ public class WebSocketFacade {
 
     public void resign(String authToken, int gameID) throws Exception {
         UserGameCommand command = new UserGameCommand(
-                UserGameCommand.CommandType.LEAVE,
+                UserGameCommand.CommandType.RESIGN,
                 authToken,
                 gameID
         );
