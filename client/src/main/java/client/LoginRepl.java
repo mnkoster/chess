@@ -108,7 +108,7 @@ public class LoginRepl {
         String raw = e.getMessage();
         String cleaned = raw.replaceAll(".*\"message\":\"", "")
                 .replaceAll("\".*", "").replaceFirst("^Error:\\s*", "");
-        System.out.println("Create game failed: " + cleaned);
+        System.out.println("Action failed: " + cleaned);
     }
 
     private boolean handleCreateGame(String name) {
@@ -135,6 +135,11 @@ public class LoginRepl {
             System.out.println("Invalid ID. Must be a number.");
             return false;
         }
+        try {
+            updateCurrentGames();
+        } catch (Exception e) {
+            printException(e);
+        }
         if (choice < 1 || choice > currentGames.size()) {
             System.out.println("Invalid game selection. Run 'list' again.");
             return false;
@@ -144,7 +149,6 @@ public class LoginRepl {
         int realGameID = selectedGame.gameID();
 
         try {
-            updateCurrentGames();
             session.server.joinGame(session.authToken, realGameID, color);
             System.out.println("Joining game...");
             session.gameplayID = selectedGame.gameID();
@@ -190,16 +194,16 @@ public class LoginRepl {
             System.out.println("Invalid ID. Must be a number.");
             return false;
         }
+        try {
+            updateCurrentGames();
+        } catch (Exception e) {
+            printException(e);
+        }
         if (choice < 1 || choice > currentGames.size()) {
             System.out.println("Invalid game selection. Run 'list' first.");
             return false;
         }
-        try {
-            var result = session.server.listGames(session.authToken);
-            currentGames = result.getGames();
-        } catch (Exception e) {
-            printException(e);
-        }
+
         var selectedGame = currentGames.get(choice - 1);
         session.gameplayID = selectedGame.gameID();
         session.playerWhite = true;
