@@ -1,8 +1,11 @@
 package server.websocket;
 
+import com.google.gson.Gson;
 import jakarta.websocket.Session;
 import websocket.messages.ServerMessage;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -12,14 +15,22 @@ import java.util.Set;
  */
 public class ConnectionManager {
 
-    Map<Integer, Set<Session>> gameConnections;
+    private final Map<Integer, Set<Session>> gameConnections = new HashMap<>();
+    private final Gson gson = new Gson();
 
     public void addConnection(int gameID, Session session) {
         gameConnections.computeIfAbsent(gameID, k -> new HashSet<>()).add(session);
     }
 
     public void removeConnection(int gameID, Session session) {
+        Set<Session> sessions = gameConnections.get(gameID);
 
+        if (sessions != null) {
+            sessions.remove(session);
+            if (sessions.isEmpty()) {
+                gameConnections.remove(gameID);
+            }
+        }
     }
 
     public void broadcastToGame(int gameID, ServerMessage message) {
@@ -38,5 +49,26 @@ public class ConnectionManager {
 
     public Set<Session> getConnections(int gameID) {
         return gameConnections.get(gameID);
+    }
+
+    private void send(Session session, ServerMessage message) {
+        try {
+            if (session.isOpen()) {
+                String json = gson.toJson(message);
+                session.getAsyncRemote().sendText(json);
+            }
+        } catch (Exception e) {
+            try {
+                session.close();
+            } catch (IOException ignored) {
+                removeSessionFromAllGames(session);
+            }
+        }
+    }
+
+    private void removeSessionFromAllGames(Session session) {
+        for (Integer gameID : gameConnections.keySet()) {
+            removeConnection(gameID, session);
+        }
     }
 }
