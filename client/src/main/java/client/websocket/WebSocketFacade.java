@@ -1,39 +1,117 @@
 package client.websocket;
 
 import chess.ChessMove;
+import com.google.gson.Gson;
+import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
+import websocket.messages.*;
+
+import java.net.URI;
 
 /**
  * 4/7/26: added for p6 websocket - handle
  */
 public class WebSocketFacade {
 
-    public void connect(String authToken, int gameID) {
+    private Session session;
+    private final Gson gson = new Gson();
+    private final NotificationHandler notifyHandler = new NotificationHandler();
+    private final URI serverUri;
+
+    public WebSocketFacade(String url) throws Exception {
+        this.serverUri = new URI(url);
+    }
+
+    public void connect(String authToken, int gameID) throws Exception {
         // call addConnection in server.ConnectionManager
+        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        session = container.connectToServer(new Endpoint() {
+            @Override
+            public void onOpen(Session session, EndpointConfig config) {
+                session.addMessageHandler(String.class, message -> onMessage(message));
+            }
+        }, serverUri);
+
+        UserGameCommand command = new UserGameCommand(
+                UserGameCommand.CommandType.CONNECT,
+                authToken,
+                gameID
+        );
+        send(command);
     }
 
     public void disconnect() {
         // call removeConnection in server.ConnectionManager
+        try {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        } catch (Exception e) {
+            System.out.println("Couldn't close connection");
+        }
     }
 
-    private void send(UserGameCommand cmd) {
+    private void send(UserGameCommand command) throws Exception {
         // serialize send json
+        try {
+            String json = gson.toJson(command);
+            session.getAsyncRemote().sendText(json);
+        } catch (Exception e) {
+            throw new Exception("Failed to send message in socket");
+        }
     }
 
-    public void makeMove(String authToken, int gameID, ChessMove move) {
+    public void makeMove(String authToken, int gameID, ChessMove move) throws Exception {
         // user makes move
+        UserGameCommand command = new UserGameCommand(
+                UserGameCommand.CommandType.MAKE_MOVE,
+                authToken,
+                gameID
+        );
+
+        // attach move later
+        send(command);
     }
 
-    public void resign(String authToken, int gameID) {
-        // user resigns, does not go back to login
+    public void resign(String authToken, int gameID) throws Exception {
+        UserGameCommand command = new UserGameCommand(
+                UserGameCommand.CommandType.LEAVE,
+                authToken,
+                gameID
+        );
+
+        send(command);
     }
 
-    public void leave(String authToken, int gameID) {
+    public void leave(String authToken, int gameID) throws Exception {
         // user leaves, does not cause resign
+        UserGameCommand command = new UserGameCommand(
+                UserGameCommand.CommandType.LEAVE,
+                authToken,
+                gameID
+        );
+
+        send(command);
     }
 
-    private void onMessage(String jsonMessage) {
+    private void onMessage(String message) {
         // deserialize -> ServerMessage
         // pass to NotificationHandler.handle()
+        ServerMessage base = gson.fromJson(message, ServerMessage.class);
+
+        switch (base.getServerMessageType()) {
+            case LOAD_GAME -> {
+                LoadGameMessage msg = gson.fromJson(message, LoadGameMessage.class);
+                notifyHandler.handleLoadGame(msg);
+            }
+            case NOTIFICATION -> {
+                NotificationMessage msg = gson.fromJson(message, NotificationMessage.class);
+                notifyHandler.handleNotification(msg);
+            }
+            case ERROR -> {
+                ServerErrorMessage msg = gson.fromJson(message, ServerErrorMessage.class);
+                notifyHandler.handleError(msg);
+            }
+        }
     }
 }

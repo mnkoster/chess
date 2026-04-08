@@ -1,6 +1,7 @@
 package client.websocket;
 
 import client.GameplayRepl;
+import websocket.messages.ServerErrorMessage;
 import websocket.messages.ServerMessage;
 
 /**
@@ -12,15 +13,15 @@ public class NotificationHandler {
 
     }
 
-    private void handleLoadGame(ServerMessage message) {
+    void handleLoadGame(ServerMessage message) {
 
     }
 
-    private void handleNotification(ServerMessage message) {
+    void handleNotification(ServerMessage message) {
 
     }
 
-    private void handleError(ServerMessage message) {
+    void handleError(ServerErrorMessage message) {
 
     }
 
