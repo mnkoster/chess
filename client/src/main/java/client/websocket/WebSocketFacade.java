@@ -24,16 +24,14 @@ public class WebSocketFacade {
         this.notifyHandler = handler;
     }
 
+    public void onOpen(Session session, EndpointConfig config) {
+        this.session = session;
+        session.addMessageHandler(String.class, this::onMessage);
+        System.out.println("WebSocket connected.");
+    }
+
     public void connect(String authToken, int gameID) throws Exception {
         // call addConnection in server.ConnectionManager
-        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        session = container.connectToServer(new Endpoint() {
-            @Override
-            public void onOpen(Session session, EndpointConfig config) {
-                session.addMessageHandler(String.class, message -> onMessage(message));
-            }
-        }, serverUri);
-
         UserGameCommand command = new UserGameCommand(
                 UserGameCommand.CommandType.CONNECT,
                 authToken,
