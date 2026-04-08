@@ -21,7 +21,14 @@ public class ReplController {
             state = switch (state) {
                 case LOGOUT -> new LogoutRepl(session).run();
                 case LOGIN -> new LoginRepl(session).run();
-                case GAMEPLAY -> new GameplayRepl(session).run();
+                case GAMEPLAY -> {
+                    try {
+                        yield new GameplayRepl(session).run();
+                    } catch (Exception e) {
+                        System.out.println("Couldn't establish websocket");
+                        yield State.LOGIN;
+                    }
+                }
                 default -> State.EXIT;
             };
         }

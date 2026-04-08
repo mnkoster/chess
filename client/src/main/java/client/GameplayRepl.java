@@ -1,8 +1,13 @@
 package client;
 
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
+import model.GameData;
 import ui.EscapeSequences;
 import ui.State;
-
+import client.websocket.WebSocketFacade;
+import client.websocket.NotificationHandler;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -15,24 +20,40 @@ public class GameplayRepl {
     private final Scanner scanner = new Scanner(System.in);
     private final boolean isWhitePerspective;
     ArrayList<String> helpList;
+    // Websocket
+    private final WebSocketFacade websocket;
+    private final ClientSession session;
+    private GameData game;
 
-    public GameplayRepl(ClientSession session) {
+    public GameplayRepl(ClientSession session) throws Exception {
         this.isWhitePerspective = session.playerWhite;
+        this.session = session;
+        NotificationHandler notifyHandler = new NotificationHandler();
+        this.websocket = new WebSocketFacade("ws://localhost:4444/ws", notifyHandler);
+        notifyHandler.setGameplayRepl(this);
 
+        // Help List extended
         helpList = new ArrayList<>();
         helpList.add("   |   Commands: ");
-        helpList.add("   |   help       : Show available commands");
-        helpList.add("   |   redraw     : Redraw the board");
-        helpList.add("   |   move       : Make move");
-        helpList.add("   |   resign     : Resign from game");
-        helpList.add("   |   highlight  : Highlight legal moves");
-        helpList.add("   |   exit       : Leave game (return to login)");
+        helpList.add("   |   help                                    : Show available commands");
+        helpList.add("   |   redraw                                  : Redraw the board");
+        helpList.add("   |   move <START> <END> {PROMO PIECE}        : Make move");
+        helpList.add("   |   highlight <position>                    : Highlight legal moves of piece at position");
+        helpList.add("   |   resign                                  : Resign from game");
+        helpList.add("   |   exit                                    : Leave game (return to login)");
     }
 
     public State run() {
         System.out.println("=== Entered Game ===");
         printHelp();
-        drawBoard();
+
+        try {
+            websocket.connect(session.authToken, session.gameplayID);
+        } catch (Exception e) {
+            System.out.println("Failed to connect to game");
+            return State.LOGIN;
+        }
+        drawBoard(null, null);
 
         while (true) {
             System.out.print("\n[GAME] >>> ");
@@ -45,7 +66,7 @@ public class GameplayRepl {
                     if (tokens.length != 1) {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                     } else {
-                        drawBoard();
+                        drawBoard(null, null);
                     }
                 }
                 case "help" -> {
@@ -59,10 +80,45 @@ public class GameplayRepl {
                     if (tokens.length != 1) {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                     } else {
+                        try {
+                            websocket.leave(session.authToken, session.gameplayID);
+                            websocket.disconnect();
+                        } catch (Exception e) {
+                            System.out.println("Error leaving game");
+                        }
+
                         System.out.println("Leaving game...");
                         return State.LOGIN;
                     }
                 }
+                // added cases
+                case "move" -> {
+                    try {
+                        if (tokens.length != 3 && tokens.length != 4) {
+                            System.out.println("Usage: move <start> <end> [promo letter]");
+                        }
+
+                        ChessPosition start = parsePosition(tokens[1]);
+                        ChessPosition end = parsePosition(tokens[2]);
+                        // add promotion piece logic
+                        // ChessPiece promotionPiece = new ChessPiece(session.playerWhite, tokens[3]);
+                        ChessMove currMove = new ChessMove(start, end, null);
+                        websocket.makeMove(session.authToken, session.gameplayID, currMove);
+                    } catch (Exception e) {
+                        String raw = e.getMessage();
+                        String cleaned = raw.replaceAll(".*\"message\":\"", "")
+                                .replaceAll("\".*", "").replaceFirst("^Error:\\s*", "");
+                        System.out.println("Invalid move: " + cleaned);
+                    }
+                }
+                case "resign" -> {
+                    try {
+                        websocket.resign(session.authToken, session.gameplayID);
+                    } catch (Exception e) {
+                        System.out.println("Failed to resign");
+                    }
+                }
+
                 default -> System.out.println("Unknown command. Type 'help'");
             }
         }
@@ -80,6 +136,12 @@ public class GameplayRepl {
         """);
     }
 
+    private ChessPosition parsePosition(String input) {
+        int col = input.charAt(0) - 'a' + 1;
+        int row = Character.getNumericValue(input.charAt(1));
+        return new ChessPosition(row, col);
+    }
+
     private void drawColumn() {
         int startCol = isWhitePerspective ? 1 : 8;
         int endCol   = isWhitePerspective ? 8 : 1;
@@ -95,13 +157,12 @@ public class GameplayRepl {
         System.out.println();
     }
 
-    private void drawBoard() {
+    public void drawBoard(ChessPosition startPos, ChessPosition endPos) {
         System.out.print(EscapeSequences.ERASE_SCREEN);
 
         int startRow = isWhitePerspective ? 8 : 1;
         int endRow   = isWhitePerspective ? 1 : 8;
         int rowStep  = isWhitePerspective ? -1 : 1;
-
         int startCol = isWhitePerspective ? 1 : 8;
         int endCol   = isWhitePerspective ? 8 : 1;
         int colStep  = isWhitePerspective ? 1 : -1;
@@ -109,9 +170,7 @@ public class GameplayRepl {
         drawColumn();
         int i = 0;
         for (int row = startRow;
-             isWhitePerspective ? row >= endRow : row <= endRow;
-             row += rowStep) {
-            // Row label
+             isWhitePerspective ? row >= endRow : row <= endRow; row += rowStep) {
             System.out.print(" " + row + " ");
 
             for (int col = startCol;
