@@ -4,7 +4,9 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
+import handler.ErrorResponse;
 import jakarta.websocket.Session;
+import model.GameData;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
 
@@ -34,28 +36,36 @@ public class WebSocketHandler {
 
     public void onMessage(Session session, String message) {
         // deserialize UserGameCommand, route to correct handler
-        UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
+        try {
+            UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
 
-        switch (command.getCommandType()) {
-            case CONNECT -> handleConnect(session, command);
-            case MAKE_MOVE -> handleMakeMove(session, command);
-            case LEAVE -> handleLeave(session, command);
-            case RESIGN -> handleResign(session, command);
+            switch (command.getCommandType()) {
+                case CONNECT -> handleConnect(session, command);
+                case MAKE_MOVE -> handleMakeMove(session, command);
+                case LEAVE -> handleLeave(session, command);
+                case RESIGN -> handleResign(session, command);
+            }
+        } catch (Exception e) {
+            sendError(session, e.getMessage());
         }
     }
 
-    private void handleConnect(Session session, UserGameCommand command) {
+    private void handleConnect(Session session, UserGameCommand command) throws Exception {
         // user actions: add to ConnectionManager, send LOAD_GAME to client, notify others
         int gameID = command.getGameID();
 
         connectionManager.addConnection(gameID, session);
-        ChessGame game = gameDAO.getGame(gameID);
+        try {
+            GameData game = gameDAO.getGame(gameID);
 
-        ServerMessage loadMessage = new LoadGameMessage(game);
-        send(session, loadMessage);
+            ServerMessage loadMessage = new LoadGameMessage(game);
+            send(session, loadMessage);
 
-        ServerMessage notification = new NotificationMessage("Player joined game");
-        connectionManager.broadcastToOthers(gameID, session, notification);
+            ServerMessage notification = new NotificationMessage("Player joined game");
+            connectionManager.broadcastToOthers(gameID, session, notification);
+        } catch (Exception e) {
+            throw new Exception("Error: websocket couldn't connect.");
+        }
     }
 
     private void handleMakeMove(Session session, UserGameCommand command) {
@@ -79,6 +89,12 @@ public class WebSocketHandler {
     }
 
     private void sendError(Session session, String errorMessage) {
-
+        try {
+            ErrorResponse error = new ErrorResponse(errorMessage);
+            String json = gson.toJson(error);
+            session.getBasicRemote().sendText(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
