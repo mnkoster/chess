@@ -99,16 +99,26 @@ public class LoginRepl {
             """);
     }
 
+    private void updateCurrentGames() throws Exception {
+        var result = session.server.listGames(session.authToken);
+        currentGames = result.getGames();
+    }
+
+    private void printException(Exception e) {
+        String raw = e.getMessage();
+        String cleaned = raw.replaceAll(".*\"message\":\"", "")
+                .replaceAll("\".*", "").replaceFirst("^Error:\\s*", "");
+        System.out.println("Create game failed: " + cleaned);
+    }
+
     private boolean handleCreateGame(String name) {
         try {
+            updateCurrentGames();
             session.server.createGame(session.authToken, name);
             System.out.println("Creating game...");
             return true;
         } catch (Exception e) {
-            String raw = e.getMessage();
-            String cleaned = raw.replaceAll(".*\"message\":\"", "")
-                    .replaceAll("\".*", "").replaceFirst("^Error:\\s*", "");
-            System.out.println("Create game failed: " + cleaned);
+            printException(e);
             return false;
         }
     }
@@ -134,24 +144,21 @@ public class LoginRepl {
         int realGameID = selectedGame.gameID();
 
         try {
+            updateCurrentGames();
             session.server.joinGame(session.authToken, realGameID, color);
             System.out.println("Joining game...");
             session.gameplayID = selectedGame.gameID();
             session.playerWhite = color.equals("WHITE");
             return true;
         } catch (Exception e) {
-            String raw = e.getMessage();
-            String cleaned = raw.replaceAll(".*\"message\":\"", "")
-                    .replaceAll("\".*", "").replaceFirst("^Error:\\s*", "");
-            System.out.println("Join game failed: " + cleaned);
+            printException(e);
             return false;
         }
     }
 
     private boolean handleListGames() {
         try {
-            var result = session.server.listGames(session.authToken);
-            currentGames = result.getGames();
+            updateCurrentGames();
 
             if (currentGames == null || currentGames.isEmpty()) {
                 System.out.println("No games available.");
@@ -170,10 +177,7 @@ public class LoginRepl {
             }
             return true;
         } catch (Exception e) {
-            String raw = e.getMessage();
-            String cleaned = raw.replaceAll(".*\"message\":\"", "")
-                    .replaceAll("\".*", "").replaceFirst("^Error:\\s*", "");
-            System.out.println("List game failed: " + cleaned);
+            printException(e);
             return false;
         }
     }
@@ -189,6 +193,12 @@ public class LoginRepl {
         if (choice < 1 || choice > currentGames.size()) {
             System.out.println("Invalid game selection. Run 'list' first.");
             return false;
+        }
+        try {
+            var result = session.server.listGames(session.authToken);
+            currentGames = result.getGames();
+        } catch (Exception e) {
+            printException(e);
         }
         var selectedGame = currentGames.get(choice - 1);
         session.gameplayID = selectedGame.gameID();
