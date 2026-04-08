@@ -1,9 +1,9 @@
 package server.websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
-import handler.ErrorResponse;
 import jakarta.websocket.Session;
 import model.GameData;
 import websocket.commands.UserGameCommand;
@@ -17,20 +17,21 @@ public class WebSocketHandler {
     private Gson gson;
     private final ConnectionManager connectionManager;
     private final GameDAO gameDAO;
-    private final AuthDAO authDAO;
+//    private final AuthDAO authDAO;
 
-    public WebSocketHandler(ConnectionManager cm, GameDAO gameDAO, AuthDAO authDAO) {
-        this.connectionManager = cm;
+    public WebSocketHandler(ConnectionManager connManager, GameDAO gameDAO, AuthDAO authDAO) {
+        this.connectionManager = connManager;
         this.gameDAO = gameDAO;
-        this.authDAO = authDAO;
+//        this.authDAO = authDAO;
     }
 
     public void onConnect(Session session) {
-
+        System.out.println("Websocket connected");
     }
 
     public void onClose(Session session) {
         // remove from ConnectionManager
+        connectionManager.removeSessionFromAllGames(session);
     }
 
     public void onMessage(Session session, String message) {
@@ -52,40 +53,76 @@ public class WebSocketHandler {
     private void handleConnect(Session session, UserGameCommand command) throws Exception {
         // user actions: add to ConnectionManager, send LOAD_GAME to client, notify others
         int gameID = command.getGameID();
-
         connectionManager.addConnection(gameID, session);
-        try {
-            GameData game = gameDAO.getGame(gameID);
-
-            ServerMessage loadMessage = new LoadGameMessage(game);
-            send(session, loadMessage);
-
-            ServerMessage notification = new NotificationMessage("Player joined game");
-            connectionManager.broadcastToOthers(gameID, session, notification);
-        } catch (Exception e) {
-            throw new Exception("Error: websocket couldn't connect.");
+        GameData game = gameDAO.getGame(gameID);
+        if (game == null) {
+            throw new Exception("Game not found");
         }
+        send(session, new LoadGameMessage(game));
+        connectionManager.broadcastToGame(gameID, new NotificationMessage("UPDATE: Player joined the game"));
     }
 
-    private void handleMakeMove(Session session, UserGameCommand command) {
+    private void handleMakeMove(Session session, UserGameCommand command) throws Exception {
         // user actions: validate move, update game, save to DB, broadcast (load game, notification)
+        int gameID = command.getGameID();
+        GameData game = gameDAO.getGame(gameID);
+        if (game == null) {
+            throw new Exception("Game not found");
+        }
+        // Extend UserGameCommand makemove
 
+        // Validate move
+
+        gameDAO.updateGame(game);
+        broadcastGameState(gameID);
+        connectionManager.broadcastToOthers(
+                gameID,
+                session,
+                new NotificationMessage("UPDATE: A move was made")
+        );
     }
 
     private void handleLeave(Session session, UserGameCommand command) {
         // user actions: remove from ConnectionManager, update DB if player, notify others
+        int gameID = command.getGameID();
+        connectionManager.removeConnection(gameID, session);
+        connectionManager.broadcastToOthers(
+                gameID,
+                session,
+                new NotificationMessage("UPDATE: A player left the game")
+        );
     }
 
-    private void handleResign (Session session, UserGameCommand cmd) {
+    private void handleResign (Session session, UserGameCommand command) throws Exception {
         // user actions: mark game over, save to DB, notify all
+        int gameID = command.getGameID();
+        GameData game = gameDAO.getGame(gameID);
+        if (game == null) {
+            throw new Exception("Game not found");
+        }
+        // set game as over
+        gameDAO.updateGame(game);
+        connectionManager.broadcastToGame(gameID, new NotificationMessage("UPDATE: A player resigned. Game over."));
     }
 
-    private void send(Session session, ServerMessage message) {
-
+    private void send(Session session, ServerMessage message) throws Exception {
+        try {
+            if (session.isOpen()) {
+                String json = gson.toJson(message);
+                session.getBasicRemote().sendText(json);
+            }
+        } catch (Exception e) {
+            throw new Exception("Error sending notification");
+        }
     }
 
-    private void broadcastGameState(int gameID) {
+    private void broadcastGameState(int gameID) throws Exception {
+        GameData game = gameDAO.getGame(gameID);
 
+        connectionManager.broadcastToGame(
+                gameID,
+                new LoadGameMessage(game)
+        );
     }
 
     private void sendError(Session session, String errorMessage) {

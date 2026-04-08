@@ -66,7 +66,7 @@ public class ConnectionManager {
         }
     }
 
-    private void removeSessionFromAllGames(Session session) {
+    public void removeSessionFromAllGames(Session session) {
         for (Integer gameID : gameConnections.keySet()) {
             removeConnection(gameID, session);
         }
