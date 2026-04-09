@@ -104,9 +104,12 @@ public class WebSocketHandler {
             return;
         }
         // MAKE MOVE
-        ChessPosition startPos = command.getMove().getStartPosition();
-        ChessPosition endPos = command.getMove().getEndPosition();
-        ChessPiece.PieceType promo = command.getMove().getPromotionPiece();
+        var move = command.getMove();
+        System.out.println(move + "this is the move");
+        System.out.println(gson.toJson(command));
+        ChessPosition startPos = new ChessPosition(move.start.row, move.start.column);
+        ChessPosition endPos = new ChessPosition(move.end.row, move.end.column);
+        ChessPiece.PieceType promo = move.promoType;
         try {
             game.game().makeMove(new ChessMove(startPos, endPos, promo));
         } catch (InvalidMoveException e) {
@@ -140,7 +143,7 @@ public class WebSocketHandler {
         connectionManager.broadcastToOthers(
                 gameID,
                 session,
-                new NotificationMessage(username + " made move: " + startPos.toString() + endPos.toString())
+                new NotificationMessage(username + " made move: " + startPos + endPos)
         );
         // game over notifications
         if (gameOver) {

@@ -12,8 +12,10 @@ public class NotificationHandler {
 
     void handleLoadGame(ServerMessage message) {
         LoadGameMessage msg = (LoadGameMessage) message;
+        repl.setGame(msg.getGame());
         if (repl != null) {
             repl.drawBoard(null, null); // redraw with updated state
+            System.out.print("[GAME] >>> ");
         }
     }
 

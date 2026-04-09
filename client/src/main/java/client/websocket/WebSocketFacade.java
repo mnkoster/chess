@@ -1,6 +1,5 @@
 package client.websocket;
 
-import chess.ChessMove;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import websocket.commands.MakeMoveCommand;
@@ -70,15 +69,26 @@ public class WebSocketFacade {
         }
     }
 
-    public void makeMove(String authToken, int gameID, ChessMove move) throws Exception {
+    private void sendMove(MakeMoveCommand command) throws Exception {
+        // serialize send json
+        try {
+            String json = gson.toJson(command);
+            session.getAsyncRemote().sendText(json);
+        } catch (Exception e) {
+            throw new Exception("Failed to send message in socket");
+        }
+    }
+
+    public void makeMove(String authToken, int gameID, MakeMoveCommand.MoveDTO move) throws Exception {
         // user makes move
         MakeMoveCommand command = new MakeMoveCommand(
+                UserGameCommand.CommandType.MAKE_MOVE,
                 authToken,
                 gameID,
                 move
         );
         // attach move later
-        send(command);
+        sendMove(command);
     }
 
     public void resign(String authToken, int gameID) throws Exception {

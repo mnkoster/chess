@@ -1,12 +1,14 @@
 package client;
 
-import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
 import ui.EscapeSequences;
 import ui.State;
 import client.websocket.WebSocketFacade;
 import client.websocket.NotificationHandler;
+import websocket.commands.MakeMoveCommand;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -56,11 +58,8 @@ public class GameplayRepl {
             return State.LOGIN;
         }
         System.out.println("=== Entered Game ===");
-        printHelp();
-        drawBoard(null, null);
 
         while (true) {
-            System.out.print("\n[GAME] >>> ");
             String input = scanner.nextLine().trim();
             String[] tokens = input.split("\\s+");
             String command = tokens[0];
@@ -104,8 +103,18 @@ public class GameplayRepl {
                         ChessPosition start = parsePosition(tokens[1]);
                         ChessPosition end = parsePosition(tokens[2]);
                         // add promotion piece logic
-                        // ChessPiece promotionPiece = new ChessPiece(session.playerWhite, tokens[3]);
-                        ChessMove currMove = new ChessMove(start, end, null);
+                        ChessPiece.PieceType promoPiece = null;
+                        if (tokens.length == 4) {
+                            promoPiece = determinePromoPiece(tokens[3]);
+                        }
+                        MakeMoveCommand.MoveDTO currMove = new MakeMoveCommand.MoveDTO();
+                        currMove.start = new MakeMoveCommand.Position();
+                        currMove.end = new MakeMoveCommand.Position();
+                        currMove.start.row = start.getRow();
+                        currMove.start.column = start.getColumn();
+                        currMove.end.row = end.getRow();
+                        currMove.end.column = end.getColumn();
+                        currMove.promoType = promoPiece;
                         websocket.makeMove(clientSession.authToken, clientSession.gameplayID, currMove);
                     } catch (Exception e) {
                         String raw = e.getMessage();
@@ -138,9 +147,28 @@ public class GameplayRepl {
         }
     }
 
-    public void updateGame(GameData newGame) {
-        this.game = newGame;
-        drawBoard(null, null);
+    public void setGame(GameData game) {
+        this.game = game;
+    }
+
+    private ChessPiece.PieceType determinePromoPiece(String input) {
+        switch (input) {
+            case "KNIGHT" -> {
+                return ChessPiece.PieceType.KNIGHT;
+            }
+            case "BISHOP" -> {
+                return ChessPiece.PieceType.BISHOP;
+            }
+            case "ROOK" -> {
+                return ChessPiece.PieceType.ROOK;
+            }
+            case "QUEEN" -> {
+                return ChessPiece.PieceType.QUEEN;
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 
     private void printHelp() {
@@ -159,11 +187,28 @@ public class GameplayRepl {
         - highlight                                 : Highlight legal moves
         - exit                                      : Leave game (return to login)
         """);
+        System.out.print("[GAME] >>> ");
     }
 
     private ChessPosition parsePosition(String input) {
-        int col = input.charAt(0) - 'a' + 1;
-        int row = Character.getNumericValue(input.charAt(1));
+        if (input == null || input.length() < 2) {
+            throw new IllegalArgumentException("Invalid position: " + input);
+        }
+        input = input.trim().toLowerCase();
+        char file = input.charAt(0);
+        if (file < 'a' || file > 'h') {
+            throw new IllegalArgumentException("Invalid column: " + file);
+        }
+        int col = file - 'a' + 1;
+        int row;
+        try {
+            row = Integer.parseInt(input.substring(1));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid row: " + input.substring(1));
+        }
+        if (row < 1 || row > 8) {
+            throw new IllegalArgumentException("Row out of bounds: " + row);
+        }
         return new ChessPosition(row, col);
     }
 
