@@ -1,9 +1,7 @@
 package service;
 
-import java.util.Collection;
 import java.util.List;
 
-import chess.ChessGame;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
@@ -76,6 +74,9 @@ public class GameService {
             throw new BadRequestException("Error: bad request");
         }
         if (playerColor.equalsIgnoreCase("WHITE")) {
+            if (username.equals(game.whiteUsername())) {
+                return;
+            }
             if (game.whiteUsername() != null) {
                 throw new AlreadyTakenException("Error: already taken");
             }
@@ -84,9 +85,12 @@ public class GameService {
                     username,
                     game.blackUsername(),
                     game.gameName(),
-                    new ChessGame()
+                    game.game()
             );
         } else {
+            if (username.equals(game.blackUsername())) {
+                return;
+            }
             if (game.blackUsername() != null) {
                 throw new AlreadyTakenException("Error: already taken");
             }
@@ -95,7 +99,7 @@ public class GameService {
                     game.whiteUsername(),
                     username,
                     game.gameName(),
-                    new ChessGame()
+                    game.game()
             );
         }
 

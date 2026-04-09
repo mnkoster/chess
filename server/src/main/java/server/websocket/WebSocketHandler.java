@@ -68,8 +68,8 @@ public class WebSocketHandler {
             send(session, new ServerErrorMessage("invalid authentication"));
             return;
         }
-        send(session, new LoadGameMessage(game));
         String username = authDAO.getUsername(command.getAuthToken());
+        send(session, new LoadGameMessage(game));
         connectionManager.broadcastToOthers(gameID, session, new NotificationMessage(username + " entered the game"));
     }
 
