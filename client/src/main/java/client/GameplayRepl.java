@@ -98,10 +98,6 @@ public class GameplayRepl {
                         if (tokens.length != 3 && tokens.length != 4) {
                             System.out.println("Usage: move <start> <end> [promo letter]");
                         }
-                        if (clientSession.getPlayerType().equals(ClientSession.playerTypes.OBSERVER)) {
-                            System.out.println("You are observing the game.");
-                            break;
-                        }
 
                         ChessPosition start = parsePosition(tokens[1]);
                         ChessPosition end = parsePosition(tokens[2]);
@@ -120,10 +116,6 @@ public class GameplayRepl {
                     if (tokens.length != 1) {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                     } else {
-                        if (clientSession.getPlayerType().equals(ClientSession.playerTypes.OBSERVER)) {
-                            System.out.println("You are observing the game.");
-                            break;
-                        }
                         try {
                             websocket.resign(clientSession.authToken, clientSession.gameplayID);
                         } catch (Exception e) {

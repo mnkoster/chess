@@ -76,6 +76,12 @@ public class WebSocketHandler {
             send(session, new ServerErrorMessage("invalid gameID"));
             return;
         }
+        String auth = command.getAuthToken();
+        String username = authDAO.getUsername(auth);
+        if (!(game.whiteUsername().equals(username) || game.blackUsername().equals(username))) {
+            send(session, new ServerErrorMessage("observer cannot make moves"));
+            return;
+        }
         // Extend UserGameCommand makemove
 
         // Validate move
@@ -108,9 +114,15 @@ public class WebSocketHandler {
             send(session, new ServerErrorMessage("invalid gameID"));
             return;
         }
+        String auth = command.getAuthToken();
+        String username = authDAO.getUsername(auth);
+        if (!(game.whiteUsername().equals(username) || game.blackUsername().equals(username))) {
+            send(session, new ServerErrorMessage("observer cannot make moves"));
+            return;
+        }
+
         // set game as over
         gameDAO.updateGame(game);
-        String username = authDAO.getUsername(command.getAuthToken());
         connectionManager.broadcastToGame(
                 gameID,
                 new NotificationMessage(username + " resigned. Game over.")
