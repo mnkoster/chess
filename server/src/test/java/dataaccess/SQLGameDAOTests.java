@@ -78,7 +78,8 @@ public class SQLGameDAOTests {
                 "whitePlayer",
                 "blackPlayer",
                 "UpdatedGame",
-                new ChessGame()
+                new ChessGame(),
+                false
         );
         gameDAO.updateGame(updated);
 
@@ -96,7 +97,8 @@ public class SQLGameDAOTests {
                     "white",
                     "black",
                     "NonexistentGame",
-                    new ChessGame()
+                    new ChessGame(),
+                    false
             );
             gameDAO.updateGame(invalidGame);
         });

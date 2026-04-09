@@ -85,7 +85,8 @@ public class GameService {
                     username,
                     game.blackUsername(),
                     game.gameName(),
-                    game.game()
+                    game.game(),
+                    game.isGameOver()
             );
         } else {
             if (username.equals(game.blackUsername())) {
@@ -99,7 +100,8 @@ public class GameService {
                     game.whiteUsername(),
                     username,
                     game.gameName(),
-                    game.game()
+                    game.game(),
+                    game.isGameOver()
             );
         }
 

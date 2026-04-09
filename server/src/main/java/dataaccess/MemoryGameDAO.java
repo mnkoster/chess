@@ -24,7 +24,7 @@ public class MemoryGameDAO implements GameDAO {
     public int createGame(String gameName) throws DataAccessException {
         int id = nextGameID;
         nextGameID++;
-        GameData game = new GameData(id, null, null, gameName, new ChessGame());
+        GameData game = new GameData(id, null, null, gameName, new ChessGame(), false);
         games.add(game);
         return id;
     }

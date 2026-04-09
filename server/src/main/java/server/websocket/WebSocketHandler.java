@@ -75,6 +75,7 @@ public class WebSocketHandler {
 
     private void handleMakeMove(Session session, MakeMoveCommand command) throws Exception {
         // user actions: validate move, update game, save to DB, broadcast (load game, notification)
+        // ENTRY
         int gameID = command.getGameID();
         GameData game = gameDAO.getGame(gameID);
         if (game == null) {
@@ -87,6 +88,12 @@ public class WebSocketHandler {
             send(session, new ServerErrorMessage("observer cannot make moves"));
             return;
         }
+        // MAKE SURE GAME IS NOT OVER
+        if (game.isGameOver()) {
+            send(session, new ServerErrorMessage("game is over, cannot make moves"));
+            return;
+        }
+        // VALIDATE USER
         ChessGame.TeamColor currColor = game.game().getTeamTurn();
         if (game.whiteUsername().equals(username) && currColor != ChessGame.TeamColor.WHITE) {
             send(session, new ServerErrorMessage("not white's turn"));
@@ -96,7 +103,7 @@ public class WebSocketHandler {
             send(session, new ServerErrorMessage("not black's turn"));
             return;
         }
-        // Extend UserGameCommand makemove
+        // MAKE MOVE
         ChessPosition startPos = command.getMove().getStartPosition();
         ChessPosition endPos = command.getMove().getEndPosition();
         ChessPiece.PieceType promo = command.getMove().getPromotionPiece();
@@ -106,13 +113,51 @@ public class WebSocketHandler {
             send(session, new ServerErrorMessage("invalid move"));
             return;
         }
-        gameDAO.updateGame(game);
+        ChessGame chess = game.game();
+        String winner = null;
+
+        boolean whiteCheckmate = chess.isInCheckmate(ChessGame.TeamColor.WHITE);
+        boolean blackCheckmate = chess.isInCheckmate(ChessGame.TeamColor.BLACK);
+        boolean whiteStalemate = chess.isInStalemate(ChessGame.TeamColor.WHITE);
+        boolean blackStalemate = chess.isInStalemate(ChessGame.TeamColor.BLACK);
+        boolean gameOver = whiteCheckmate || blackCheckmate || whiteStalemate || blackStalemate;
+        if (whiteCheckmate) {
+            winner = "BLACK";
+        } else if (blackCheckmate) {
+            winner = "WHITE";
+        }
+        GameData updatedGame = new GameData(
+                game.gameID(),
+                game.whiteUsername(),
+                game.blackUsername(),
+                game.gameName(),
+                game.game(),
+                gameOver
+        );
+        gameDAO.updateGame(updatedGame);
         broadcastGameState(gameID);
+        // move notifications
         connectionManager.broadcastToOthers(
                 gameID,
                 session,
                 new NotificationMessage(username + " made move: " + startPos.toString() + endPos.toString())
         );
+        // game over notifications
+        if (gameOver) {
+            if (winner == null) {
+                connectionManager.broadcastToOthers(
+                        gameID,
+                        session,
+                        new NotificationMessage("game over: stalemate")
+                );
+            } else {
+                connectionManager.broadcastToOthers(
+                        gameID,
+                        session,
+                        new NotificationMessage("game over: " + winner + " won")
+                );
+            }
+        }
     }
 
     private void handleLeave(Session session, UserGameCommand command) {
@@ -138,7 +183,8 @@ public class WebSocketHandler {
                     white,
                     black,
                     game.gameName(),
-                    game.game()
+                    game.game(),
+                    true
             );
 
             gameDAO.updateGame(updatedGame);
@@ -169,7 +215,6 @@ public class WebSocketHandler {
             return;
         }
 
-        // set game as over
         gameDAO.updateGame(game);
         connectionManager.broadcastToGame(
                 gameID,

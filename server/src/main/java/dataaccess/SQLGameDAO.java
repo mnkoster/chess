@@ -8,7 +8,6 @@ import model.GameData;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -32,7 +31,8 @@ public class SQLGameDAO implements GameDAO {
                     whiteUsername VARCHAR(255) NULL,
                     blackUsername VARCHAR(255) NULL,
                     gameName VARCHAR (255) NOT NULL,
-                    game TEXT NOT NULL
+                    game TEXT NOT NULL,
+                    isGameOver BOOLEAN NOT NULL DEFAULT FALSE
                 )
                 """;
         try (var conn = DatabaseManager.getConnection();
@@ -60,8 +60,9 @@ public class SQLGameDAO implements GameDAO {
                 String blackPlayer = rs.getString("blackUsername");
                 String gameJson = rs.getString("game");
                 ChessGame game = gson.fromJson(gameJson, ChessGame.class);
+                boolean isGameOver = rs.getBoolean("isGameOver");
 
-                gamesList.add(new GameData(gameID, whitePlayer, blackPlayer, gameName, game));
+                gamesList.add(new GameData(gameID, whitePlayer, blackPlayer, gameName, game, isGameOver));
             }
         } catch (Exception ex) {
             throw new DataAccessException("unable to get list of games", ex);
@@ -74,8 +75,8 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public int createGame(String gameName) throws DataAccessException {
         var createGame = """
-                INSERT INTO games(whiteUsername, blackUsername, gameName, game)
-                VALUES (NULL, NULL, ?, ?)
+                INSERT INTO games(whiteUsername, blackUsername, gameName, game, isGameOver)
+                VALUES (NULL, NULL, ?, ?, FALSE)
                 """;
         try (var conn = DatabaseManager.getConnection();
             var statement = conn.prepareStatement(createGame, Statement.RETURN_GENERATED_KEYS)) {
@@ -103,7 +104,7 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         var getGame = """
-                SELECT gameID, whiteUsername, blackUsername, gameName, game
+                SELECT gameID, whiteUsername, blackUsername, gameName, game, isGameOver
                 FROM games
                 WHERE gameID = ?
                 """;
@@ -117,8 +118,9 @@ public class SQLGameDAO implements GameDAO {
                     String black = rs.getString("blackUsername");
                     String gameJson = rs.getString("game");
                     ChessGame game = gson.fromJson(gameJson, ChessGame.class);
+                    boolean isGameOver = rs.getBoolean("isGameOver");
 
-                    return new GameData(gameID, white, black, gameNameDB, game);
+                    return new GameData(gameID, white, black, gameNameDB, game, isGameOver);
                 }
             }
         } catch (Exception ex) {
@@ -131,7 +133,7 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public void updateGame(GameData game) throws DataAccessException {
         String updateGame = """
-            UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ?
+            UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ?, isGameOver = ?
             WHERE gameID = ?
             """;
         try (var conn = DatabaseManager.getConnection();
@@ -141,7 +143,8 @@ public class SQLGameDAO implements GameDAO {
             statement.setString(2, game.blackUsername());
             statement.setString(3, game.gameName());
             statement.setString(4, gson.toJson(game.game()));
-            statement.setInt(5, game.gameID());
+            statement.setBoolean(5, game.isGameOver());
+            statement.setInt(6, game.gameID());
             int affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {
                 throw new DataAccessException("Game with ID " + game.gameID() + " does not exist");
