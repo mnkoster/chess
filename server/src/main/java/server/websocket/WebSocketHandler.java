@@ -54,7 +54,12 @@ public class WebSocketHandler {
         connectionManager.addConnection(gameID, session);
         GameData game = gameDAO.getGame(gameID);
         if (game == null) {
-            send(session, new ServerErrorMessage("Error: Invalid gameID"));
+            send(session, new ServerErrorMessage("invalid gameID"));
+            return;
+        }
+        String auth = authDAO.getUsername(command.getAuthToken());
+        if (auth == null) {
+            send(session, new ServerErrorMessage("invalid authentication"));
             return;
         }
         send(session, new LoadGameMessage(game));
