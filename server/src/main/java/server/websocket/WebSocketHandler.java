@@ -212,6 +212,10 @@ public class WebSocketHandler {
             send(session, new ServerErrorMessage("observer cannot make moves"));
             return;
         }
+        if (game.isGameOver()) {
+            send (session, new ServerErrorMessage("game is already over"));
+            return;
+        }
         GameData updatedGame = new GameData(
                 game.gameID(),
                 game.whiteUsername(),
