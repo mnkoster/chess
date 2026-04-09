@@ -47,7 +47,7 @@ public class ConnectionManager {
     }
 
     public Set<Session> getConnections(int gameID) {
-        return gameConnections.get(gameID);
+        return gameConnections.getOrDefault(gameID, Set.of());
     }
 
     private void send(Session session, ServerMessage message) {

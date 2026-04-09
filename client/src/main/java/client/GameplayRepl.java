@@ -30,6 +30,8 @@ public class GameplayRepl {
         this.session = session;
         NotificationHandler notifyHandler = new NotificationHandler();
         this.websocket = new WebSocketFacade("ws://localhost:4444/ws", notifyHandler);
+        websocket.open();
+        websocket.connect(session.authToken, session.gameplayID);
         notifyHandler.setGameplayRepl(this);
 
         // Help List extended

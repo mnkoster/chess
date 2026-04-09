@@ -5,8 +5,6 @@ import com.google.gson.Gson;
 import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
-
-import javax.management.NotificationFilter;
 import java.net.URI;
 
 /**
@@ -28,6 +26,16 @@ public class WebSocketFacade {
         this.session = session;
         session.addMessageHandler(String.class, this::onMessage);
         System.out.println("WebSocket connected.");
+    }
+
+    public void open() throws Exception {
+        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        container.connectToServer(new Endpoint() {
+            @Override
+            public void onOpen(Session session, EndpointConfig config) {
+                WebSocketFacade.this.onOpen(session, config);
+            }
+        }, serverUri);
     }
 
     public void connect(String authToken, int gameID) throws Exception {
