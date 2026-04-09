@@ -145,15 +145,13 @@ public class WebSocketHandler {
         // game over notifications
         if (gameOver) {
             if (winner == null) {
-                connectionManager.broadcastToOthers(
+                connectionManager.broadcastToGame(
                         gameID,
-                        session,
                         new NotificationMessage("game over: stalemate")
                 );
             } else {
-                connectionManager.broadcastToOthers(
+                connectionManager.broadcastToGame(
                         gameID,
-                        session,
                         new NotificationMessage("game over: " + winner + " won")
                 );
             }
