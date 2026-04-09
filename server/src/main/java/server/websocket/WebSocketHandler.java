@@ -2,6 +2,7 @@ package server.websocket;
 
 import com.google.gson.Gson;
 import dataaccess.*;
+import model.AuthData;
 import org.eclipse.jetty.websocket.api.Session;
 import model.GameData;
 import websocket.commands.UserGameCommand;
@@ -57,7 +58,7 @@ public class WebSocketHandler {
             send(session, new ServerErrorMessage("invalid gameID"));
             return;
         }
-        String auth = authDAO.getUsername(command.getAuthToken());
+        AuthData auth = authDAO.getAuth(command.getAuthToken());
         if (auth == null) {
             send(session, new ServerErrorMessage("invalid authentication"));
             return;
@@ -72,7 +73,8 @@ public class WebSocketHandler {
         int gameID = command.getGameID();
         GameData game = gameDAO.getGame(gameID);
         if (game == null) {
-            throw new Exception("Game not found");
+            send(session, new ServerErrorMessage("invalid gameID"));
+            return;
         }
         // Extend UserGameCommand makemove
 
@@ -103,11 +105,16 @@ public class WebSocketHandler {
         int gameID = command.getGameID();
         GameData game = gameDAO.getGame(gameID);
         if (game == null) {
-            throw new Exception("Game not found");
+            send(session, new ServerErrorMessage("invalid gameID"));
+            return;
         }
         // set game as over
         gameDAO.updateGame(game);
-        connectionManager.broadcastToOthers(gameID, session, new NotificationMessage("UPDATE: A player resigned. Game over."));
+        String username = authDAO.getUsername(command.getAuthToken());
+        connectionManager.broadcastToGame(
+                gameID,
+                new NotificationMessage(username + " resigned. Game over.")
+        );
     }
 
     private void send(Session session, ServerMessage message) throws Exception {
