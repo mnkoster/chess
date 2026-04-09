@@ -10,9 +10,9 @@ public class ClientMain {
         System.out.println("♕ 240 Chess Client");
 
         String serverUrl = "http://localhost:4444";
-        ClientSession session = new ClientSession(serverUrl);
+        ClientSession clientSession = new ClientSession(serverUrl);
 
-        ReplController repl = new ReplController(session);
+        ReplController repl = new ReplController(clientSession);
         repl.run();
     }
 }

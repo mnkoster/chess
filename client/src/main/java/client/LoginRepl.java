@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * 3/28/26: added for p5 gameplay
+ * 4/8/26: updated for p6 gameplay
+ */
 public class LoginRepl {
 
     private final ClientSession clientSession;
@@ -152,7 +156,11 @@ public class LoginRepl {
             clientSession.server.joinGame(clientSession.authToken, realGameID, color);
             System.out.println("Joining game...");
             clientSession.gameplayID = selectedGame.gameID();
-            clientSession.playerWhite = color.equals("WHITE");
+            if (color.equals("WHITE")) {
+                clientSession.PlayerType(ClientSession.playerTypes.PLAYER_WHITE);
+            } else {
+                clientSession.PlayerType(ClientSession.playerTypes.PLAYER_BLACK);
+            }
             return true;
         } catch (Exception e) {
             printException(e);
@@ -206,7 +214,7 @@ public class LoginRepl {
 
         var selectedGame = currentGames.get(choice - 1);
         clientSession.gameplayID = selectedGame.gameID();
-        clientSession.playerWhite = true;
+        clientSession.PlayerType(ClientSession.playerTypes.OBSERVER);
         System.out.println("Observing game...");
         return true;
     }

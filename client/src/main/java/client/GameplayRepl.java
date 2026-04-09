@@ -26,8 +26,8 @@ public class GameplayRepl {
     private GameData game;
 
     public GameplayRepl(ClientSession session) throws Exception {
-        this.isWhitePerspective = session.playerWhite;
         this.clientSession = session;
+        this.isWhitePerspective = !clientSession.getPlayerType().equals(ClientSession.playerTypes.PLAYER_BLACK);
         NotificationHandler notifyHandler = new NotificationHandler();
         this.websocket = new WebSocketFacade("ws://localhost:4444/ws", notifyHandler);
         websocket.open();
@@ -98,6 +98,10 @@ public class GameplayRepl {
                         if (tokens.length != 3 && tokens.length != 4) {
                             System.out.println("Usage: move <start> <end> [promo letter]");
                         }
+                        if (clientSession.getPlayerType().equals(ClientSession.playerTypes.OBSERVER)) {
+                            System.out.println("You are observing the game.");
+                            break;
+                        }
 
                         ChessPosition start = parsePosition(tokens[1]);
                         ChessPosition end = parsePosition(tokens[2]);
@@ -113,10 +117,18 @@ public class GameplayRepl {
                     }
                 }
                 case "resign" -> {
-                    try {
-                        websocket.resign(clientSession.authToken, clientSession.gameplayID);
-                    } catch (Exception e) {
-                        System.out.println("Failed to resign");
+                    if (tokens.length != 1) {
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
+                    } else {
+                        if (clientSession.getPlayerType().equals(ClientSession.playerTypes.OBSERVER)) {
+                            System.out.println("You are observing the game.");
+                            break;
+                        }
+                        try {
+                            websocket.resign(clientSession.authToken, clientSession.gameplayID);
+                        } catch (Exception e) {
+                            System.out.println("Failed to resign");
+                        }
                     }
                 }
 
