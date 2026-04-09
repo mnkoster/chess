@@ -182,7 +182,7 @@ public class WebSocketHandler {
                     black,
                     game.gameName(),
                     game.game(),
-                    true
+                    game.isGameOver()
             );
 
             gameDAO.updateGame(updatedGame);
