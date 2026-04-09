@@ -80,25 +80,24 @@ public class GameplayRepl {
                 case "exit" -> {
                     if (tokens.length != 1) {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
-                    } else {
-                        try {
-                            websocket.leave(clientSession.authToken, clientSession.gameplayID);
-                            websocket.disconnect();
-                        } catch (Exception e) {
-                            System.out.println("Error leaving game");
-                        }
-
-                        System.out.println("Leaving game...");
-                        return State.LOGIN;
+                        break;
                     }
+                    try {
+                        websocket.leave(clientSession.authToken, clientSession.gameplayID);
+                        websocket.disconnect();
+                    } catch (Exception e) {
+                        System.out.println("Error leaving game");
+                    }
+                    System.out.println("Leaving game...");
+                    return State.LOGIN;
                 }
                 // added cases
                 case "move" -> {
+                    if (tokens.length != 3 && tokens.length != 4) {
+                        System.out.println("Usage: move <start> <end> [promo letter]");
+                        break;
+                    }
                     try {
-                        if (tokens.length != 3 && tokens.length != 4) {
-                            System.out.println("Usage: move <start> <end> [promo letter]");
-                        }
-
                         ChessPosition start = parsePosition(tokens[1]);
                         ChessPosition end = parsePosition(tokens[2]);
                         // add promotion piece logic
@@ -115,12 +114,12 @@ public class GameplayRepl {
                 case "resign" -> {
                     if (tokens.length != 1) {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
-                    } else {
-                        try {
-                            websocket.resign(clientSession.authToken, clientSession.gameplayID);
-                        } catch (Exception e) {
-                            System.out.println("Failed to resign");
-                        }
+                        break;
+                    }
+                    try {
+                        websocket.resign(clientSession.authToken, clientSession.gameplayID);
+                    } catch (Exception e) {
+                        System.out.println("Failed to resign");
                     }
                 }
                 case "highlight" -> {
