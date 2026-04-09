@@ -144,10 +144,6 @@ public class LoginRepl {
         } catch (Exception e) {
             printException(e);
         }
-        if (choice < 1 || choice > currentGames.size()) {
-            System.out.println("Invalid game selection. Run 'list' again.");
-            return false;
-        }
 
         var selectedGame = currentGames.get(choice - 1);
         int realGameID = selectedGame.gameID();
