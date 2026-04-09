@@ -21,7 +21,7 @@ public class ClientSession {
         this.server = new ServerFacade(serverUrl);
     }
 
-    public void playerType(ClientSession.PlayerTypes type) {
+    public void setPlayerType(ClientSession.PlayerTypes type) {
         playerType = type;
     }
 
