@@ -212,8 +212,15 @@ public class WebSocketHandler {
             send(session, new ServerErrorMessage("observer cannot make moves"));
             return;
         }
-
-        gameDAO.updateGame(game);
+        GameData updatedGame = new GameData(
+                game.gameID(),
+                game.whiteUsername(),
+                game.blackUsername(),
+                game.gameName(),
+                game.game(),
+                true
+        );
+        gameDAO.updateGame(updatedGame);
         connectionManager.broadcastToGame(
                 gameID,
                 new NotificationMessage(username + " resigned. Game over.")
