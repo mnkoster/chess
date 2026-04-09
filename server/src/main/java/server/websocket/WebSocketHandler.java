@@ -2,8 +2,7 @@ package server.websocket;
 
 import chess.ChessMove;
 import com.google.gson.Gson;
-import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
+import dataaccess.*;
 import org.eclipse.jetty.websocket.api.Session;
 import model.GameData;
 import websocket.commands.UserGameCommand;
@@ -17,12 +16,12 @@ public class WebSocketHandler {
     private final Gson gson = new Gson();
     private final ConnectionManager connectionManager;
     private final GameDAO gameDAO;
-//    private final AuthDAO authDAO;
+    private final AuthDAO authDAO;
 
     public WebSocketHandler(ConnectionManager connManager, GameDAO gameDAO, AuthDAO authDAO) {
         this.connectionManager = connManager;
         this.gameDAO = gameDAO;
-//        this.authDAO = authDAO;
+        this.authDAO = authDAO;
     }
 
     public void onConnect(Session session) {
@@ -59,7 +58,8 @@ public class WebSocketHandler {
             throw new Exception("Game not found");
         }
         send(session, new LoadGameMessage(game));
-        connectionManager.broadcastToGame(gameID, new NotificationMessage("UPDATE: Player joined the game"));
+        String username = authDAO.getUsername(command.getAuthToken());
+        connectionManager.broadcastToGame(gameID, new NotificationMessage(username + " joined the game"));
     }
 
     private void handleMakeMove(Session session, UserGameCommand command) throws Exception {

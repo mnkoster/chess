@@ -83,6 +83,29 @@ public class SQLAuthDAO implements AuthDAO {
         }
     }
 
+    @Override
+    public String getUsername(String authToken) throws DataAccessException {
+        var query = """
+            SELECT username
+            FROM authTokens
+            WHERE authToken = ?
+            """;
+
+        try (var conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(query)) {
+            preparedStatement.setString(1, authToken);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("username");
+                }
+            }
+        } catch (Exception ex) {
+            throw new DataAccessException("unable to get username from authToken", ex);
+        }
+        throw new DataAccessException("Invalid auth token");
+    }
+
     // Interface function - added 3/11/26
     @Override
     public void clear() throws DataAccessException {

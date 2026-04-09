@@ -28,6 +28,15 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     @Override
+    public String getUsername(String authToken) throws DataAccessException {
+        AuthData auth = authTokens.get(authToken);
+        if (auth == null) {
+            throw new DataAccessException("Invalid auth token");
+        }
+        return auth.username();
+    }
+
+    @Override
     public void clear() {
         authTokens.clear();
     }
