@@ -3,6 +3,7 @@ package client.websocket;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
 import java.net.URI;
@@ -25,7 +26,7 @@ public class WebSocketFacade {
     public void onOpen(Session session, EndpointConfig config) {
         this.session = session;
         session.addMessageHandler(String.class, this::onMessage);
-        System.out.println("WebSocket connected.");
+        System.out.println("WebSocket connected " + config);
     }
 
     public void open() throws Exception {
@@ -71,12 +72,11 @@ public class WebSocketFacade {
 
     public void makeMove(String authToken, int gameID, ChessMove move) throws Exception {
         // user makes move
-        UserGameCommand command = new UserGameCommand(
-                UserGameCommand.CommandType.MAKE_MOVE,
+        MakeMoveCommand command = new MakeMoveCommand(
                 authToken,
-                gameID
+                gameID,
+                move
         );
-
         // attach move later
         send(command);
     }

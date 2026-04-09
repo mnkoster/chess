@@ -44,6 +44,9 @@ public class GameplayRepl {
         helpList.add("   |   exit                                    : Leave game (return to login)");
     }
 
+    /**
+     * Run loop
+     */
     public State run() {
         try {
             websocket.open();
@@ -135,6 +138,11 @@ public class GameplayRepl {
         }
     }
 
+    public void updateGame(GameData newGame) {
+        this.game = newGame;
+        drawBoard(null, null);
+    }
+
     private void printHelp() {
         System.out.println("""
         Commands:
@@ -212,25 +220,41 @@ public class GameplayRepl {
     }
 
     private String getPieceAt(int row, int col) {
-        // Pawns
-        if (row == 2) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_PAWN; }
-        if (row == 7) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_PAWN; }
-        // Rooks
-        if (row == 1 && (col == 1 || col == 8)) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_ROOK; }
-        if (row == 8 && (col == 1 || col == 8)) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_ROOK; }
-        // Knights
-        if (row == 1 && (col == 2 || col == 7)) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KNIGHT; }
-        if (row == 8 && (col == 2 || col == 7)) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KNIGHT; }
-        // Bishops
-        if (row == 1 && (col == 3 || col == 6)) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_BISHOP; }
-        if (row == 8 && (col == 3 || col == 6)) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_BISHOP; }
-        // Queens
-        if (row == 1 && col == 4) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_QUEEN; }
-        if (row == 8 && col == 4) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_QUEEN; }
-        // Kings
-        if (row == 1 && col == 5) { return EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KING; }
-        if (row == 8 && col == 5) { return EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KING; }
+        if (game == null || game.game() == null) {
+            return EscapeSequences.EMPTY;
+        }
 
-        return EscapeSequences.EMPTY;
+        var board = game.game().getBoard();
+        var piece = board.getPiece(new ChessPosition(row, col));
+
+        if (piece == null) {
+            return EscapeSequences.EMPTY;
+        }
+
+        return switch (piece.getPieceType()) {
+            case PAWN -> piece.getTeamColor() == chess.ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_PAWN
+                    : EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_PAWN;
+
+            case ROOK -> piece.getTeamColor() == chess.ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_ROOK
+                    : EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_ROOK;
+
+            case KNIGHT -> piece.getTeamColor() == chess.ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KNIGHT
+                    : EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KNIGHT;
+
+            case BISHOP -> piece.getTeamColor() == chess.ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_BISHOP
+                    : EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_BISHOP;
+
+            case QUEEN -> piece.getTeamColor() == chess.ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_QUEEN
+                    : EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_QUEEN;
+
+            case KING -> piece.getTeamColor() == chess.ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KING
+                    : EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KING;
+        };
     }
 }

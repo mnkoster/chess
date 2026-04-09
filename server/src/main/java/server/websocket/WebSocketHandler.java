@@ -1,10 +1,12 @@
 package server.websocket;
 
+import chess.*;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
 import org.eclipse.jetty.websocket.api.Session;
 import model.GameData;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
 
@@ -40,7 +42,10 @@ public class WebSocketHandler {
 
             switch (command.getCommandType()) {
                 case CONNECT -> handleConnect(session, command);
-                case MAKE_MOVE -> handleMakeMove(session, command);
+                case MAKE_MOVE -> {
+                    MakeMoveCommand moveCommand = gson.fromJson(message, MakeMoveCommand.class);
+                    handleMakeMove(session, moveCommand);
+                }
                 case LEAVE -> handleLeave(session, command);
                 case RESIGN -> handleResign(session, command);
             }
@@ -68,7 +73,7 @@ public class WebSocketHandler {
         connectionManager.broadcastToOthers(gameID, session, new NotificationMessage(username + " entered the game"));
     }
 
-    private void handleMakeMove(Session session, UserGameCommand command) throws Exception {
+    private void handleMakeMove(Session session, MakeMoveCommand command) throws Exception {
         // user actions: validate move, update game, save to DB, broadcast (load game, notification)
         int gameID = command.getGameID();
         GameData game = gameDAO.getGame(gameID);
@@ -82,16 +87,31 @@ public class WebSocketHandler {
             send(session, new ServerErrorMessage("observer cannot make moves"));
             return;
         }
+        ChessGame.TeamColor currColor = game.game().getTeamTurn();
+        if (game.whiteUsername().equals(username) && currColor != ChessGame.TeamColor.WHITE) {
+            send(session, new ServerErrorMessage("not white's turn"));
+            return;
+        }
+        if (game.blackUsername().equals(username) && currColor != ChessGame.TeamColor.BLACK) {
+            send(session, new ServerErrorMessage("not black's turn"));
+            return;
+        }
         // Extend UserGameCommand makemove
-
-        // Validate move
-
+        ChessPosition startPos = command.getMove().getStartPosition();
+        ChessPosition endPos = command.getMove().getEndPosition();
+        ChessPiece.PieceType promo = command.getMove().getPromotionPiece();
+        try {
+            game.game().makeMove(new ChessMove(startPos, endPos, promo));
+        } catch (InvalidMoveException e) {
+            send(session, new ServerErrorMessage("invalid move"));
+            return;
+        }
         gameDAO.updateGame(game);
         broadcastGameState(gameID);
         connectionManager.broadcastToOthers(
                 gameID,
                 session,
-                new NotificationMessage("UPDATE: A move was made")
+                new NotificationMessage(username + " made move: " + startPos.toString() + endPos.toString())
         );
     }
 
