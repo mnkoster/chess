@@ -1,6 +1,5 @@
 package server.websocket;
 
-import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.*;
 import org.eclipse.jetty.websocket.api.Session;
@@ -25,7 +24,7 @@ public class WebSocketHandler {
     }
 
     public void onConnect(Session session) {
-        System.out.println("Websocket connected");
+        System.out.println("Websocket connected: " + session);
     }
 
     public void onClose(Session session) {
@@ -59,7 +58,7 @@ public class WebSocketHandler {
         }
         send(session, new LoadGameMessage(game));
         String username = authDAO.getUsername(command.getAuthToken());
-        connectionManager.broadcastToGame(gameID, new NotificationMessage(username + " joined the game"));
+        connectionManager.broadcastToOthers(gameID, session, new NotificationMessage(username + " entered the game"));
     }
 
     private void handleMakeMove(Session session, UserGameCommand command) throws Exception {
@@ -102,7 +101,7 @@ public class WebSocketHandler {
         }
         // set game as over
         gameDAO.updateGame(game);
-        connectionManager.broadcastToGame(gameID, new NotificationMessage("UPDATE: A player resigned. Game over."));
+        connectionManager.broadcastToOthers(gameID, session, new NotificationMessage("UPDATE: A player resigned. Game over."));
     }
 
     private void send(Session session, ServerMessage message) throws Exception {
@@ -131,7 +130,7 @@ public class WebSocketHandler {
             String json = gson.toJson(error);
             session.getRemote().sendString(json);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("This is websocket handler, error");
         }
     }
 }

@@ -1,7 +1,6 @@
 package client;
 
 import chess.ChessMove;
-import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
 import ui.EscapeSequences;
@@ -30,23 +29,24 @@ public class GameplayRepl {
         this.isWhitePerspective = !clientSession.getPlayerType().equals(ClientSession.playerTypes.PLAYER_BLACK);
         NotificationHandler notifyHandler = new NotificationHandler();
         this.websocket = new WebSocketFacade("ws://localhost:4444/ws", notifyHandler);
-        websocket.open();
-        websocket.connect(session.authToken, session.gameplayID);
         notifyHandler.setGameplayRepl(this);
 
         // Help List extended
         helpList = new ArrayList<>();
         helpList.add("   |   Commands: ");
         helpList.add("   |   help                                    : Show available commands");
+        if (!clientSession.getPlayerType().equals(ClientSession.playerTypes.OBSERVER)) {
+            helpList.add("   |   move <START> <END> {PROMO PIECE}        : Make move");
+            helpList.add("   |   resign                                  : Resign from game");
+        }
         helpList.add("   |   redraw                                  : Redraw the board");
-        helpList.add("   |   move <START> <END> {PROMO PIECE}        : Make move");
         helpList.add("   |   highlight <position>                    : Highlight legal moves of piece at position");
-        helpList.add("   |   resign                                  : Resign from game");
         helpList.add("   |   exit                                    : Leave game (return to login)");
     }
 
     public State run() {
         try {
+            websocket.open();
             websocket.connect(clientSession.authToken, clientSession.gameplayID);
         } catch (Exception e) {
             System.out.println("Failed to connect to game");
@@ -131,7 +131,14 @@ public class GameplayRepl {
                         }
                     }
                 }
-
+                case "highlight" -> {
+                    if (tokens.length != 2) {
+                        System.out.println("Invalid number of arguments. Type 'help' to see options.");
+                        System.out.println("Usage: highlight <position>");
+                    } else {
+                        System.out.println("Implement highlight please");
+                    }
+                }
                 default -> System.out.println("Unknown command. Type 'help'");
             }
         }
@@ -140,10 +147,16 @@ public class GameplayRepl {
     private void printHelp() {
         System.out.println("""
         Commands:
-        - help                                      : Show available commands
-        - redraw                                    : Redraw the board
+        - help                                      : Show available commands""");
+        if (clientSession.getPlayerType().equals(ClientSession.playerTypes.OBSERVER)) {
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_DARK_GREY);
+        }
+        System.out.println("""
         - move                                      : Make move
-        - resign                                    : Resign from game
+        - resign                                    : Resign from game""");
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
+        System.out.println("""
+        - redraw                                    : Redraw the board
         - highlight                                 : Highlight legal moves
         - exit                                      : Leave game (return to login)
         """);
