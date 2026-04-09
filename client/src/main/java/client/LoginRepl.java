@@ -9,12 +9,12 @@ import java.util.Scanner;
 
 public class LoginRepl {
 
-    private final ClientSession session;
+    private final ClientSession clientSession;
     private final Scanner scanner = new Scanner(System.in);
     private List<GameData> currentGames = new ArrayList<>();
 
-    public LoginRepl(ClientSession session) {
-        this.session = session;
+    public LoginRepl(ClientSession clientSession) {
+        this.clientSession = clientSession;
     }
 
     public State run() {
@@ -100,7 +100,7 @@ public class LoginRepl {
     }
 
     private void updateCurrentGames() throws Exception {
-        var result = session.server.listGames(session.authToken);
+        var result = clientSession.server.listGames(clientSession.authToken);
         currentGames = result.getGames();
     }
 
@@ -114,7 +114,7 @@ public class LoginRepl {
     private boolean handleCreateGame(String name) {
         try {
             updateCurrentGames();
-            session.server.createGame(session.authToken, name);
+            clientSession.server.createGame(clientSession.authToken, name);
             System.out.println("Creating game...");
             return true;
         } catch (Exception e) {
@@ -149,10 +149,10 @@ public class LoginRepl {
         int realGameID = selectedGame.gameID();
 
         try {
-            session.server.joinGame(session.authToken, realGameID, color);
+            clientSession.server.joinGame(clientSession.authToken, realGameID, color);
             System.out.println("Joining game...");
-            session.gameplayID = selectedGame.gameID();
-            session.playerWhite = color.equals("WHITE");
+            clientSession.gameplayID = selectedGame.gameID();
+            clientSession.playerWhite = color.equals("WHITE");
             return true;
         } catch (Exception e) {
             printException(e);
@@ -205,15 +205,15 @@ public class LoginRepl {
         }
 
         var selectedGame = currentGames.get(choice - 1);
-        session.gameplayID = selectedGame.gameID();
-        session.playerWhite = true;
+        clientSession.gameplayID = selectedGame.gameID();
+        clientSession.playerWhite = true;
         System.out.println("Observing game...");
         return true;
     }
 
     private boolean handleLogout() {
         try {
-            session.server.logout(session.authToken);
+            clientSession.server.logout(clientSession.authToken);
             return true;
         } catch (Exception e) {
             System.out.println("Failed to logout. Try again.");

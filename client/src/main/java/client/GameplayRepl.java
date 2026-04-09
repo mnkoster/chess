@@ -22,12 +22,12 @@ public class GameplayRepl {
     ArrayList<String> helpList;
     // Websocket
     private final WebSocketFacade websocket;
-    private final ClientSession session;
+    private final ClientSession clientSession;
     private GameData game;
 
     public GameplayRepl(ClientSession session) throws Exception {
         this.isWhitePerspective = session.playerWhite;
-        this.session = session;
+        this.clientSession = session;
         NotificationHandler notifyHandler = new NotificationHandler();
         this.websocket = new WebSocketFacade("ws://localhost:4444/ws", notifyHandler);
         websocket.open();
@@ -47,7 +47,7 @@ public class GameplayRepl {
 
     public State run() {
         try {
-            websocket.connect(session.authToken, session.gameplayID);
+            websocket.connect(clientSession.authToken, clientSession.gameplayID);
         } catch (Exception e) {
             System.out.println("Failed to connect to game");
             return State.LOGIN;
@@ -82,7 +82,7 @@ public class GameplayRepl {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                     } else {
                         try {
-                            websocket.leave(session.authToken, session.gameplayID);
+                            websocket.leave(clientSession.authToken, clientSession.gameplayID);
                             websocket.disconnect();
                         } catch (Exception e) {
                             System.out.println("Error leaving game");
@@ -104,7 +104,7 @@ public class GameplayRepl {
                         // add promotion piece logic
                         // ChessPiece promotionPiece = new ChessPiece(session.playerWhite, tokens[3]);
                         ChessMove currMove = new ChessMove(start, end, null);
-                        websocket.makeMove(session.authToken, session.gameplayID, currMove);
+                        websocket.makeMove(clientSession.authToken, clientSession.gameplayID, currMove);
                     } catch (Exception e) {
                         String raw = e.getMessage();
                         String cleaned = raw.replaceAll(".*\"message\":\"", "")
@@ -114,7 +114,7 @@ public class GameplayRepl {
                 }
                 case "resign" -> {
                     try {
-                        websocket.resign(session.authToken, session.gameplayID);
+                        websocket.resign(clientSession.authToken, clientSession.gameplayID);
                     } catch (Exception e) {
                         System.out.println("Failed to resign");
                     }

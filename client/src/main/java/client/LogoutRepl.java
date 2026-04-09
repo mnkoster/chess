@@ -7,11 +7,11 @@ import java.util.Scanner;
 
 public class LogoutRepl {
 
-    private final ClientSession session;
+    private final ClientSession clientSession;
     private final Scanner scanner = new Scanner(System.in);
 
-    public LogoutRepl(ClientSession session) {
-        this.session = session;
+    public LogoutRepl(ClientSession clientSession) {
+        this.clientSession = clientSession;
     }
 
     public State run() {
@@ -54,7 +54,7 @@ public class LogoutRepl {
                         return State.LOGOUT;
                     }
                     try {
-                        session.server.clear();
+                        clientSession.server.clear();
                     } catch (Exception e){
                         System.out.println("Unable to clear db.");
                     }
@@ -78,9 +78,9 @@ public class LogoutRepl {
 
     private boolean handleLogin(String username, String password) {
         try {
-            AuthData auth = session.server.login(username, password);
-            session.authToken = auth.authToken();
-            session.username = auth.username();
+            AuthData auth = clientSession.server.login(username, password);
+            clientSession.authToken = auth.authToken();
+            clientSession.username = auth.username();
 
             System.out.println("Login successful!");
             return true;
@@ -95,9 +95,9 @@ public class LogoutRepl {
 
     private boolean handleRegister(String username, String password, String email) {
         try {
-            AuthData auth = session.server.register(username, password, email);
-            session.authToken = auth.authToken();
-            session.username = auth.username();
+            AuthData auth = clientSession.server.register(username, password, email);
+            clientSession.authToken = auth.authToken();
+            clientSession.username = auth.username();
 
             System.out.println("Registration successful! You are now logged in.");
             return true;
