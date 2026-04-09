@@ -10,22 +10,11 @@ public class NotificationHandler {
 
     private GameplayRepl repl;
 
-    public void handle(ServerMessage message) {
-        switch (message.getServerMessageType()) {
-            case LOAD_GAME -> handleLoadGame(message);
-            case NOTIFICATION -> handleNotification(message);
-            case ERROR -> handleError(message);
-        }
-    }
-
     void handleLoadGame(ServerMessage message) {
         LoadGameMessage msg = (LoadGameMessage) message;
-
-        // store game state if your REPL tracks it
-        // e.g., repl.setGame(msg.getGame());
-        // if (repl != null) {
-        // repl.drawBoard(); // redraw with updated state
-        // }
+        if (repl != null) {
+            repl.drawBoard(null, null); // redraw with updated state
+        }
     }
 
     void handleNotification(ServerMessage message) {
