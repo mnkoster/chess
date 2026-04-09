@@ -26,7 +26,7 @@ public class GameplayRepl {
 
     public GameplayRepl(ClientSession session) throws Exception {
         this.clientSession = session;
-        this.isWhitePerspective = !clientSession.getPlayerType().equals(ClientSession.playerTypes.PLAYER_BLACK);
+        this.isWhitePerspective = !clientSession.getPlayerType().equals(ClientSession.PlayerTypes.PLAYER_BLACK);
         NotificationHandler notifyHandler = new NotificationHandler();
         this.websocket = new WebSocketFacade("ws://localhost:4444/ws", notifyHandler);
         notifyHandler.setGameplayRepl(this);
@@ -35,7 +35,7 @@ public class GameplayRepl {
         helpList = new ArrayList<>();
         helpList.add("   |   Commands: ");
         helpList.add("   |   help                                    : Show available commands");
-        if (!clientSession.getPlayerType().equals(ClientSession.playerTypes.OBSERVER)) {
+        if (!clientSession.getPlayerType().equals(ClientSession.PlayerTypes.OBSERVER)) {
             helpList.add("   |   move <START> <END> {PROMO PIECE}        : Make move");
             helpList.add("   |   resign                                  : Resign from game");
         }
@@ -140,7 +140,7 @@ public class GameplayRepl {
         System.out.println("""
         Commands:
         - help                                      : Show available commands""");
-        if (clientSession.getPlayerType().equals(ClientSession.playerTypes.OBSERVER)) {
+        if (clientSession.getPlayerType().equals(ClientSession.PlayerTypes.OBSERVER)) {
             System.out.print(EscapeSequences.SET_TEXT_COLOR_DARK_GREY);
         }
         System.out.println("""

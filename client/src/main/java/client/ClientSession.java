@@ -9,9 +9,9 @@ public class ClientSession {
     public String username;
     public ServerFacade server;
     public int gameplayID;
-    public static playerTypes playerType;
+    public static PlayerTypes playerType;
 
-    public enum playerTypes {
+    public enum PlayerTypes {
         PLAYER_WHITE,
         PLAYER_BLACK,
         OBSERVER
@@ -21,11 +21,11 @@ public class ClientSession {
         this.server = new ServerFacade(serverUrl);
     }
 
-    public void PlayerType(ClientSession.playerTypes type) {
+    public void PlayerType(ClientSession.PlayerTypes type) {
         playerType = type;
     }
 
-    public ClientSession.playerTypes getPlayerType() {
+    public ClientSession.PlayerTypes getPlayerType() {
         return playerType;
     }
 }

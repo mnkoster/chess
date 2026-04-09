@@ -153,9 +153,9 @@ public class LoginRepl {
             System.out.println("Joining game...");
             clientSession.gameplayID = selectedGame.gameID();
             if (color.equals("WHITE")) {
-                clientSession.PlayerType(ClientSession.playerTypes.PLAYER_WHITE);
+                clientSession.PlayerType(ClientSession.PlayerTypes.PLAYER_WHITE);
             } else {
-                clientSession.PlayerType(ClientSession.playerTypes.PLAYER_BLACK);
+                clientSession.PlayerType(ClientSession.PlayerTypes.PLAYER_BLACK);
             }
             return true;
         } catch (Exception e) {
@@ -210,7 +210,7 @@ public class LoginRepl {
 
         var selectedGame = currentGames.get(choice - 1);
         clientSession.gameplayID = selectedGame.gameID();
-        clientSession.PlayerType(ClientSession.playerTypes.OBSERVER);
+        clientSession.PlayerType(ClientSession.PlayerTypes.OBSERVER);
         System.out.println("Observing game...");
         return true;
     }
