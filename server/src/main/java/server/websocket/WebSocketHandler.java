@@ -117,13 +117,41 @@ public class WebSocketHandler {
 
     private void handleLeave(Session session, UserGameCommand command) {
         // user actions: remove from ConnectionManager, update DB if player, notify others
-        int gameID = command.getGameID();
-        connectionManager.removeConnection(gameID, session);
-        connectionManager.broadcastToOthers(
-                gameID,
-                session,
-                new NotificationMessage("UPDATE: A player left the game")
-        );
+        try {
+            int gameID = command.getGameID();
+            GameData game = gameDAO.getGame(gameID);
+            if (game == null) {
+                sendError(session, "invalid gameID");
+                return;
+            }
+            String authToken = command.getAuthToken();
+            String username = authDAO.getUsername(authToken);
+            String white = game.whiteUsername();
+            String black = game.blackUsername();
+            if (username.equals(white)) {
+                white = null;
+            } else if (username.equals(black)) {
+                black = null;
+            }
+            GameData updatedGame = new GameData(
+                    game.gameID(),
+                    white,
+                    black,
+                    game.gameName(),
+                    game.game()
+            );
+
+            gameDAO.updateGame(updatedGame);
+            connectionManager.removeConnection(gameID, session);
+            connectionManager.broadcastToOthers(
+                    gameID,
+                    session,
+                    new NotificationMessage(username + " left the game")
+            );
+
+        } catch (Exception e) {
+            sendError(session, "Error leaving game");
+        }
     }
 
     private void handleResign (Session session, UserGameCommand command) throws Exception {
