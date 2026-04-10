@@ -107,8 +107,8 @@ public class WebSocketHandler {
         var move = command.getMove();
         System.out.println(move + "this is the move");
         System.out.println(gson.toJson(command));
-        ChessPosition startPos = new ChessPosition(move.start.row, move.start.column);
-        ChessPosition endPos = new ChessPosition(move.end.row, move.end.column);
+        ChessPosition startPos = new ChessPosition(move.start.row, move.start.col);
+        ChessPosition endPos = new ChessPosition(move.end.row, move.end.col);
         ChessPiece.PieceType promo = move.promoType;
         try {
             game.game().makeMove(new ChessMove(startPos, endPos, promo));

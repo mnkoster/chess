@@ -11,6 +11,7 @@ import handler.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.time.Duration;
 
 /**
  * 3/2/26: added for p3 apis
@@ -75,6 +76,7 @@ public class Server {
         javalin.delete("/db", clearHandler::handle);
         javalin.ws("/ws", ws -> {
             ws.onConnect(ctx -> {
+                ctx.session.setIdleTimeout(Duration.ofSeconds(600000));
                 wsHandler.onConnect(ctx.session);
             });
             ws.onClose(ctx -> {

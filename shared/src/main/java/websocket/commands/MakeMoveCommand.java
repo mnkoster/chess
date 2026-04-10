@@ -4,7 +4,7 @@ import chess.ChessPiece;
 
 public class MakeMoveCommand extends UserGameCommand {
 
-    private final MoveDTO move;
+    private MoveDTO move;
 
     public MakeMoveCommand(CommandType commandType,
                            String authToken,
@@ -26,6 +26,6 @@ public class MakeMoveCommand extends UserGameCommand {
 
     public static class Position {
         public int row;
-        public int column;
+        public int col;
     }
 }

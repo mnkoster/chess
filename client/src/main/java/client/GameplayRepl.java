@@ -111,10 +111,11 @@ public class GameplayRepl {
                         currMove.start = new MakeMoveCommand.Position();
                         currMove.end = new MakeMoveCommand.Position();
                         currMove.start.row = start.getRow();
-                        currMove.start.column = start.getColumn();
+                        currMove.start.col = start.getColumn();
                         currMove.end.row = end.getRow();
-                        currMove.end.column = end.getColumn();
+                        currMove.end.col = end.getColumn();
                         currMove.promoType = promoPiece;
+//                        System.out.println("I AM HERE \n\n" + currMove.start.row);
                         websocket.makeMove(clientSession.authToken, clientSession.gameplayID, currMove);
                     } catch (Exception e) {
                         String raw = e.getMessage();
