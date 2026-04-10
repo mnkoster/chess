@@ -1,5 +1,6 @@
 package client.websocket;
 
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import websocket.commands.MakeMoveCommand;
@@ -74,6 +75,7 @@ public class WebSocketFacade {
         try {
             String json = gson.toJson(command);
             session.getAsyncRemote().sendText(json);
+
         } catch (Exception e) {
             throw new Exception("Failed to send message in socket");
         }

@@ -14,7 +14,7 @@ public class NotificationHandler {
         LoadGameMessage msg = (LoadGameMessage) message;
         repl.setGame(msg.getGame());
         if (repl != null) {
-            repl.drawBoard(null, null); // redraw with updated state
+            repl.drawBoard(repl.getMostRecentStart(), repl.getMostRecentEnd()); // redraw with updated state
             System.out.print("[GAME] >>> ");
         }
     }

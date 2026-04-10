@@ -25,6 +25,16 @@ public class GameplayRepl {
     private final WebSocketFacade websocket;
     private final ClientSession clientSession;
     private GameData game;
+    private ChessPosition mostRecentStart;
+    private ChessPosition mostRecentEnd;
+
+    public ChessPosition getMostRecentEnd() {
+        return mostRecentEnd;
+    }
+
+    public ChessPosition getMostRecentStart() {
+        return mostRecentStart;
+    }
 
     public GameplayRepl(ClientSession session) throws Exception {
         this.clientSession = session;
@@ -32,6 +42,8 @@ public class GameplayRepl {
         NotificationHandler notifyHandler = new NotificationHandler();
         this.websocket = new WebSocketFacade("ws://localhost:4444/ws", notifyHandler);
         notifyHandler.setGameplayRepl(this);
+        this.mostRecentStart = null;
+        this.mostRecentEnd = null;
 
         // Help List extended
         helpList = new ArrayList<>();
@@ -70,6 +82,7 @@ public class GameplayRepl {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                     } else {
                         drawBoard(null, null);
+                        System.out.println("[GAME] >>> ");
                     }
                 }
                 case "help" -> {
@@ -115,8 +128,9 @@ public class GameplayRepl {
                         currMove.end.row = end.getRow();
                         currMove.end.col = end.getColumn();
                         currMove.promoType = promoPiece;
-//                        System.out.println("I AM HERE \n\n" + currMove.start.row);
                         websocket.makeMove(clientSession.authToken, clientSession.gameplayID, currMove);
+                        mostRecentStart = start;
+                        mostRecentEnd = end;
                     } catch (Exception e) {
                         String raw = e.getMessage();
                         String cleaned = raw.replaceAll(".*\"message\":\"", "")
@@ -140,7 +154,12 @@ public class GameplayRepl {
                         System.out.println("Invalid number of arguments. Type 'help' to see options.");
                         System.out.println("Usage: highlight <position>");
                     } else {
-                        System.out.println("Implement highlight please");
+                        try {
+                            ChessPosition pos = parsePosition(tokens[1]);
+                            drawBoardHighlight(pos);
+                        } catch (Exception e) {
+                            System.out.println("Invalid position");
+                        }
                     }
                 }
                 default -> System.out.println("Unknown command. Type 'help'");
@@ -249,9 +268,20 @@ public class GameplayRepl {
                  col += colStep) {
 
                 boolean isLightSquare = (row + col) % 2 == 0;
-                String bgColor = isLightSquare
-                        ? EscapeSequences.SET_BG_COLOR_GREY
-                        : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+                String bgColor;
+                if (new ChessPosition(row, col).equals(startPos)) {
+                    bgColor = isLightSquare
+                            ? EscapeSequences.SET_BG_COLOR_LIGHT_GREEN
+                            : EscapeSequences.SET_BG_COLOR_LIGHTER_GREEN;
+                } else if (new ChessPosition(row, col).equals(endPos)) {
+                    bgColor = isLightSquare
+                            ? EscapeSequences.SET_BG_COLOR_DARKER_GREEN
+                            : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+                } else {
+                    bgColor = isLightSquare
+                            ? EscapeSequences.SET_BG_COLOR_GREY
+                            : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+                }
                 String piece = getPieceAt(row, col);
                 System.out.print(bgColor + piece + EscapeSequences.RESET_BG_COLOR);
             }
@@ -302,5 +332,93 @@ public class GameplayRepl {
                     ? EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KING
                     : EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KING;
         };
+    }
+
+    public void drawBoardHighlight(ChessPosition position) {
+        if (game == null || game.game() == null) {
+            drawBoard(null, null);
+            return;
+        }
+
+        // Get legal moves for that position
+        var board = game.game().getBoard();
+        var piece = board.getPiece(position);
+
+        if (piece == null) {
+            System.out.println("No piece at that position.");
+            return;
+        }
+
+        var moves = game.game().validMoves(position);
+
+        ArrayList<ChessPosition> highlightSquares = new ArrayList<>();
+        for (var move : moves) {
+            highlightSquares.add(move.getEndPosition());
+        }
+
+        drawBoardWithHighlights(position, highlightSquares);
+    }
+
+    private void drawBoardWithHighlights(ChessPosition selected,
+                                         ArrayList<ChessPosition> highlights) {
+
+        System.out.print(EscapeSequences.ERASE_SCREEN);
+
+        int startRow = isWhitePerspective ? 8 : 1;
+        int endRow   = isWhitePerspective ? 1 : 8;
+        int rowStep  = isWhitePerspective ? -1 : 1;
+        int startCol = isWhitePerspective ? 1 : 8;
+        int endCol   = isWhitePerspective ? 8 : 1;
+        int colStep  = isWhitePerspective ? 1 : -1;
+
+        drawColumn();
+        int i = 0;
+
+        for (int row = startRow;
+             isWhitePerspective ? row >= endRow : row <= endRow;
+             row += rowStep) {
+
+            System.out.print(" " + row + " ");
+
+            for (int col = startCol;
+                 isWhitePerspective ? col <= endCol : col >= endCol;
+                 col += colStep) {
+
+                ChessPosition current = new ChessPosition(row, col);
+                boolean isLightSquare = (row + col) % 2 == 0;
+
+                String bgColor;
+                if (current.equals(selected)) {
+                    bgColor = isLightSquare
+                            ? EscapeSequences.SET_BG_COLOR_LIGHT_GREEN
+                            : EscapeSequences.SET_BG_COLOR_LIGHTER_GREEN;
+
+                } else if (highlights.contains(current)) {
+                    bgColor = isLightSquare
+                            ? EscapeSequences.SET_BG_COLOR_DARK_BLUE
+                            : EscapeSequences.SET_BG_COLOR_BLUE;
+
+                    // Normal board
+                } else {
+                    bgColor = isLightSquare
+                            ? EscapeSequences.SET_BG_COLOR_GREY
+                            : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+                }
+
+                String piece = getPieceAt(row, col);
+                System.out.print(bgColor + piece + EscapeSequences.RESET_BG_COLOR);
+            }
+
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + " " + row + " ");
+
+            if (i < helpList.size()) {
+                System.out.print(helpList.get(i));
+                i++;
+            }
+
+            System.out.println();
+        }
+
+        drawColumn();
     }
 }
